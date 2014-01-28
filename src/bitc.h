@@ -1,0 +1,108 @@
+#ifndef __BTC_H__
+#define __BTC_H__
+
+
+enum bitc_state {
+   BITC_STATE_STARTING,
+   BITC_STATE_UPDATE_HEADERS,
+   BITC_STATE_UPDATE_TXDB,
+   BITC_STATE_READY,
+   BITC_STATE_EXITING,
+};
+
+enum wallet_state {
+   WALLET_UNKNOWN,
+   WALLET_PLAIN,
+   WALLET_ENCRYPTED_LOCKED,
+   WALLET_ENCRYPTED_UNLOCKED,
+};
+
+
+struct btc_tx_desc {
+   char         label[256];
+   uint32       num_addr;
+   uint64       total_value;
+   int64        fee;
+   struct {
+      char      addr[64];
+      uint64    value;
+   } dst[16];
+};
+
+
+struct BITCApp {
+   enum bitc_state          state;
+   enum wallet_state        wallet_state;
+   struct poll_loop        *poll;
+   struct config           *config;
+   struct config           *contactsCfg;
+   struct config           *txLabelsCfg;
+   struct blockstore       *blockStore;
+   struct wallet           *wallet;
+   struct bloom_filter     *filter;
+   struct addrbook         *book;
+   struct ncui             *ui;
+   struct peergroup        *peerGroup;
+   struct poolworker_state *pw;
+   struct mutex            *lock;
+
+   volatile int             stop;
+   bool                     updateAndExit;
+   bool                     notifyInit;
+   int                      eventFd;
+   int                      notifyFd;
+   struct circlist_item    *reqList;
+};
+
+extern struct BITCApp *btc;
+extern bool bitc_testing;
+
+void btc_req_stop(void);
+void btc_req_tx(struct btc_tx_desc *tx_desc);
+
+/*
+ *-------------------------------------------------------------------
+ *
+ * bitc_ready --
+ *
+ *-------------------------------------------------------------------
+ */
+
+static inline bool
+bitc_ready(void)
+{
+   return btc->state == BITC_STATE_READY;
+}
+
+
+/*
+ *-------------------------------------------------------------------
+ *
+ * bitc_starting --
+ *
+ *-------------------------------------------------------------------
+ */
+
+static inline bool
+bitc_starting(void)
+{
+   return btc->state < BITC_STATE_READY;
+}
+
+
+/*
+ *-------------------------------------------------------------------
+ *
+ * bitc_exiting --
+ *
+ *-------------------------------------------------------------------
+ */
+
+static inline bool
+bitc_exiting(void)
+{
+   return btc->state > BITC_STATE_READY;
+}
+
+
+#endif /* __BTC_H__ */
