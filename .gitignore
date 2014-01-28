@@ -1,0 +1,13 @@
+gmon*
+*.o
+*.d
+.~
+*.swp
+bitc
+lldb
+tags
+cscope*
+*core*
+log*
+vgcore*
+*dSYM
