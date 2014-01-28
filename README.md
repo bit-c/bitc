@@ -17,7 +17,7 @@ bitc is a *thin* SPV bitcoin client.
 
 #### Screenshots
 
-![dashboard](https://i.imgur.com/S4h33KU.png)
+![dashboard](https://i.imgur.com/IJJU14s.png)
 
 ---
 
