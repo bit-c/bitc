@@ -2087,7 +2087,8 @@ ncui_dashboard_color_test(WINDOW *win,
 
 static int
 ncui_dashboard_latest_blocks(WINDOW *win,
-                             int y)
+                             int y,
+                             int num_tx)
 {
    int last = -1;
    int y0 = y;
@@ -2134,8 +2135,8 @@ ncui_dashboard_latest_blocks(WINDOW *win,
    mvwaddch(win, y, 8, ACS_BTEE);
    mvwaddch(win, y, 19, ACS_PLUS);
    mvwaddch(win, y0 - 1, 8, ACS_TTEE);
-   mvwaddch(win, y0 - 1, 19, btcui->tx_num > 0 ? ACS_PLUS : ACS_TTEE);
-   if (btcui->tx_num > 0) {
+   mvwaddch(win, y0 - 1, 19, num_tx > 0 ? ACS_PLUS : ACS_TTEE);
+   if (num_tx > 0) {
       mvwaddch(win, y0 - 1, 33, ACS_BTEE);
    }
    y++;
@@ -2231,7 +2232,8 @@ ncui_dashboard_peers(WINDOW *win,
 
 static int
 ncui_dashboard_latest_tx(WINDOW *win,
-                         int y)
+                         int y,
+                         int *num_tx)
 {
    struct bitcui_tx *tx_info = btcui->tx_info;
    time_t now;
@@ -2285,6 +2287,7 @@ ncui_dashboard_latest_tx(WINDOW *win,
       n++;
       free(ts);
    }
+   *num_tx = n;
    if (n > 0) {
       mvwhline(win, y++, 0, ACS_HLINE, COLS - 1);
       mvwprintw(win, yLabel, 1, "%u transaction%s in the past 48h:",
@@ -2449,6 +2452,7 @@ ncui_dashboard_update(void)
    struct ncpanel *panel = ncui_get_panel_by_type(PANEL_DASHBOARD);
    WINDOW *win;
    size_t len = 0;
+   int num_tx = 0;
    int y;
 
    ASSERT(mutex_islocked(btcui->lock));
@@ -2466,8 +2470,8 @@ ncui_dashboard_update(void)
    y = ncui_dashboard_header(win, y, &len);
    y = ncui_dashboard_balance(win, y, len);
    y = ncui_dashboard_sync_info(win, y);
-   y = ncui_dashboard_latest_tx(win, y);
-   y = ncui_dashboard_latest_blocks(win, y);
+   y = ncui_dashboard_latest_tx(win, y, &num_tx);
+   y = ncui_dashboard_latest_blocks(win, y, num_tx);
    y = ncui_dashboard_peers(win, y);
 
    if (0) {
