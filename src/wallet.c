@@ -475,14 +475,17 @@ wallet_save_keys(struct wallet *wallet)
 
    if (wallet->pass) {
       char saltStr[80];
+      int64 count = 0;
       bool s;
 
       RAND_bytes(wallet->ckey->salt, sizeof wallet->ckey->salt);
       str_snprintf_bytes(saltStr, sizeof saltStr, NULL,
                          wallet->ckey->salt, sizeof wallet->ckey->salt);
       config_setstring(cfg, saltStr, "encryption.salt");
-      s = crypt_set_key_from_passphrase(wallet->pass, wallet->ckey);
+      s = crypt_set_key_from_passphrase(wallet->pass, wallet->ckey, &count);
       ASSERT(s);
+      ASSERT(count >= CRYPT_NUM_ITERATIONS_OLD);
+      config_setint64(cfg, count, "encryption.numIterations");
    }
 
    hashtable_for_each(wallet->hash_keys, wallet_save_key_cb, cfg);
@@ -519,8 +522,10 @@ exit:
 
 static void
 wallet_crypt_init(struct wallet *wallet,
-                  const char    *saltStr)
+                  const char    *saltStr,
+                  int64          count)
 {
+   int64 count0 = count;
    uint8 *salt;
    size_t len;
    bool s;
@@ -540,8 +545,10 @@ wallet_crypt_init(struct wallet *wallet,
    memcpy(wallet->ckey->salt, salt, len);
    free(salt);
 
-   s = crypt_set_key_from_passphrase(wallet->pass, wallet->ckey);
+   s = crypt_set_key_from_passphrase(wallet->pass, wallet->ckey, &count0);
+
    ASSERT(s);
+   ASSERT(count == count0);
 }
 
 
@@ -560,11 +567,14 @@ wallet_load_keys(struct wallet     *wallet,
                  enum wallet_state *wallet_state)
 {
    char *saltStr;
+   int64 count;
    int n;
    int i;
 
    n = config_getint64(cfg, 0, "numKeys");
    saltStr = config_getstring(cfg, NULL, "encryption.salt");
+   count = config_getint64(cfg, CRYPT_NUM_ITERATIONS_OLD,
+                           "encryption.numIterations");
 
    if (saltStr == NULL) {
       *wallet_state = WALLET_PLAIN;
@@ -572,7 +582,7 @@ wallet_load_keys(struct wallet     *wallet,
       *wallet_state = WALLET_ENCRYPTED_LOCKED;
    }
 
-   wallet_crypt_init(wallet, saltStr);
+   wallet_crypt_init(wallet, saltStr, count);
    free(saltStr);
 
    Log(LGPFX" %s wallet: %u key%s in file '%s'.\n",

@@ -127,6 +127,7 @@ bitc_crypt_test(void)
    struct secure_area *sec;
    struct secure_area *dec;
    struct secure_area *pass;
+   int64 count = 0;
 
    pass = secure_alloc(strlen(password) + 1);
    memcpy(pass->buf, password, strlen(password) + 1);
@@ -136,8 +137,11 @@ bitc_crypt_test(void)
    sec = secure_alloc(strlen(cleartext) + 1);
    memcpy(sec->buf, cleartext, strlen(cleartext) + 1);
 
-   s = crypt_set_key_from_passphrase(pass, &k);
+
+   s = crypt_set_key_from_passphrase(pass, &k, &count);
    ASSERT(s);
+
+   printf("num_iterations = %lld\n", count);
 
    s = crypt_encrypt(&k, sec, &cipher, &clen);
    ASSERT(s);

@@ -6,7 +6,6 @@
 #include <openssl/aes.h>
 #include <openssl/hmac.h>
 
-
 #include "util.h"
 #include "hash.h"
 #include "crypt.h"
@@ -74,6 +73,49 @@ secure_free(struct secure_area *area)
 /*
  *---------------------------------------------------------------------
  *
+ * crypt_determine_count --
+ *
+ *---------------------------------------------------------------------
+ */
+
+static int
+crypt_determine_count(const struct secure_area *pass,
+                      struct crypt_key         *ckey)
+{
+   int64 count;
+   int loop;
+
+   count = CRYPT_NUM_ITERATIONS_OLD;
+   loop = 3;
+
+   while (loop > 0) {
+      mtime_t ts;
+      int len;
+
+      ts = time_get();
+      len = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha512(), ckey->salt,
+                           pass->buf, pass->len, count, ckey->key, ckey->iv);
+
+      if (len != sizeof ckey->key) {
+         OPENSSL_cleanse(ckey->key, sizeof ckey->key);
+         OPENSSL_cleanse(ckey->iv,  sizeof ckey->iv);
+         return -1;
+      }
+      ts = time_get() - ts;
+      ASSERT(ts > 0);
+      count = count * 100 * 1000 * 1.0 / ts;
+      loop--;
+   }
+
+   Log(LGPFX" %s: result= %llu\n", __FUNCTION__, count);
+
+   return MAX(CRYPT_NUM_ITERATIONS_MIN, count);
+}
+
+
+/*
+ *---------------------------------------------------------------------
+ *
  * crypt_set_key_from_passphrase --
  *
  *---------------------------------------------------------------------
@@ -81,18 +123,33 @@ secure_free(struct secure_area *area)
 
 bool
 crypt_set_key_from_passphrase(const struct secure_area *pass,
-                              struct crypt_key         *ckey)
+                              struct crypt_key         *ckey,
+                              int64                    *count_ptr)
 {
+   int count;
    int len;
 
+   ASSERT(count_ptr);
+
+   count = *count_ptr;
+   if (*count_ptr == 0) {
+      count = crypt_determine_count(pass, ckey);
+      if (count < 0) {
+         return 0;
+      }
+   }
+
    len = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha512(), ckey->salt,
-                        pass->buf, pass->len, CRYPT_NUM_ITERATIONS,
-                        ckey->key, ckey->iv);
+                        pass->buf, pass->len, count, ckey->key, ckey->iv);
 
    if (len != sizeof ckey->key) {
       OPENSSL_cleanse(ckey->key, sizeof ckey->key);
       OPENSSL_cleanse(ckey->iv,  sizeof ckey->iv);
       return 0;
+   }
+
+   if (*count_ptr == 0) {
+      *count_ptr = count;
    }
 
    return 1;
@@ -120,6 +177,7 @@ crypt_encrypt(struct crypt_key         *ckey,
    int res;
 
    Log(LGPFX" %s:%u\n", __FUNCTION__, __LINE__);
+
    *cipher = NULL;
    *cipher_len = 0;
    clen = 0;

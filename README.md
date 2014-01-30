@@ -126,6 +126,7 @@ There are still a variety of things that need to be fixed or implemented (cf [TO
 file](TODO.md)), and some of these may explain the behavior you're seeing.  If bitc
 crashes, please collect the log file along with the core dump and open a ticket
 on github:  
+
 	https://github.com/bit-c/bitc/issues
 
 ---
