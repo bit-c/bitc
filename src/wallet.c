@@ -7,6 +7,7 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #include <openssl/rand.h>
+#include <openssl/err.h>
 
 #include "bitc-defs.h"
 #include "util.h"
@@ -478,7 +479,12 @@ wallet_save_keys(struct wallet *wallet)
       int64 count = 0;
       bool s;
 
-      RAND_bytes(wallet->ckey->salt, sizeof wallet->ckey->salt);
+      res = RAND_bytes(wallet->ckey->salt, sizeof wallet->ckey->salt);
+      if (res != 1) {
+         res = ERR_get_error();
+         Log(LGPFX" RAND_bytes failed: %d\n", res);
+         goto exit;
+      }
       str_snprintf_bytes(saltStr, sizeof saltStr, NULL,
                          wallet->ckey->salt, sizeof wallet->ckey->salt);
       config_setstring(cfg, saltStr, "encryption.salt");

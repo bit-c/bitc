@@ -251,8 +251,7 @@ bitc_add_address(const char         *desc,
 static void
 btc_bye(void)
 {
-   printf(" - contribute? http://bit-c.github.com\n"
-          " - donate bitcoins? 1PBP4S44b1ro3kD6LQhBYnsF3fAp1HYPf2\n");
+   printf("Contribute! https://github.com/bit-c/bitc\n");
 }
 
 
