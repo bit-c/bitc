@@ -370,8 +370,10 @@ peergroup_add_block_finalize(struct blockstore *bs,
    if (headerOnly == 0) {
       peergroup_set_lastblk(btc->peerGroup, &best_hash);
    }
-   bitcui_set_last_block_info(&best_hash, blockstore_get_height(bs),
-                             blockstore_get_timestamp(btc->blockStore));
+   if (bitc_ready() || (blockstore_get_height(bs) % 2000) == 0) {
+      bitcui_set_last_block_info(&best_hash, blockstore_get_height(bs),
+                                 blockstore_get_timestamp(btc->blockStore));
+   }
    if (bitc_ready()) {
       wallet_export_tx_info(btc->wallet);
    }
