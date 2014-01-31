@@ -460,15 +460,12 @@ btc_check_config(void)
       config_setstring(cfg, "Support bitc development -- https://bit-c.github.com",
                        "contact0.label");
 
-      config_setstring(cfg, "12nMGd6bzC8UpyWjd9HeZESZheZ8arttAb", "contact1.addr");
-      config_setstring(cfg, "Electronic Frontier Foundation -- URL to come",
-                       "contact1.label");
-      config_setstring(cfg, "1PC9aZC4hNX2rmmrt7uHTfYAS3hRbph4UN", "contact2.addr");
+      config_setstring(cfg, "1PC9aZC4hNX2rmmrt7uHTfYAS3hRbph4UN", "contact1.addr");
       config_setstring(cfg, "Free Software Foundation -- https://fsf.org/donate/",
-                       "contact2.label");
-      config_setstring(cfg, "1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW", "contact3.addr");
+                       "contact1.label");
+      config_setstring(cfg, "1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW", "contact2.addr");
       config_setstring(cfg, "Bitcoin Foundation -- https://bitcoinfoundation.org/donate",
-                       "contact3.label");
+                       "contact2.label");
 
       config_setstring(cfg, "3", "contacts.numEntries");
 
@@ -526,6 +523,8 @@ btc_check_wallet(void)
           " - <left> and <right> allow you to change panel,\n"
           " - <CTRL> + T to initiate a transaction,\n"
           " - type 'q' to exit.\n\n");
+
+   printf("Your install of bitc is ready to go.\n");
 
 exit:
    free(wltPath);
