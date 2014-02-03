@@ -1,7 +1,7 @@
 ### KNOWN ISSUES
 * if at the time the client is shutdown the current block is later orphaned,
   the next time we launch the app, the app will resync from the wallet's birth
-  day. Need to resync the synchronization phase.
+  day. Need to fix-up the synchronization phase.
 
 ---
 
@@ -12,7 +12,9 @@
 * stealth address,
 * coinjoin ability,
 * BIP32 deterministic wallet,
-* TOR support.
+* TOR support,
+* handle json style commands via socket,
+* editor for some kind of coin-selection tool.
 
 #### P0
 * in case of chain re-org: make sure that only the tx on the 'best chain' are
@@ -35,6 +37,8 @@
 * misc synchronization issues: struct config accessed from both ui & main
   threads?
 * add ability to sign/verify a text message.
+* handle socket commands:
+  https://pay.reddit.com/r/Bitcoin/comments/1wmzba/new_bitc_a_new_thin_spv_bitcoin_client_for/cf5c8fw
 
 #### P1
 * better fee computation: right now, 0.0001 for everything.

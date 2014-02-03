@@ -85,7 +85,7 @@ A log file is generated in `/tmp/bitc-$USER.log`.
 
 To navigate the UI:
  - `<left>` and `<right>` allow you to change panel,
- - `<CTRL>` + T to initiate a transaction,
+ - `<CTRL>` + `t` to initiate a transaction,
  - type `q` or `back quote` to exit.
 
 ---
