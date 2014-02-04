@@ -413,7 +413,7 @@ netasync_getsocket_errno(const struct netasync_socket *sock)
 
 static void
 netasync_sock_recv_cb(struct netasync_socket *sock,
-                      void                   *recvBuf0,
+                      void                   *recvBuf,
                       size_t                  len,
                       void                   *clientdata)
 {
@@ -434,10 +434,6 @@ netasync_sock_send_cb(struct netasync_socket *sock,
                       void                   *clientData,
                       int                     err)
 {
-   if (err != 0) {
-      NOT_TESTED();
-      return;
-   }
    netasync_socks_handler(sock);
 }
 
@@ -457,9 +453,13 @@ netasync_socks_handler(struct netasync_socket *sock)
    size_t slen;
    int res;
 
-   LOG(1, (LGPFX" %s:%u -- %s\n",
+   LOG(1, (LGPFX" %s:%u -- %s err=%d\n",
            __FUNCTION__, __LINE__,
-           socks5_state2str(sock->socks_state)));
+           socks5_state2str(sock->socks_state), sock->err));
+
+   if (sock->err != 0) {
+      goto exit;
+   }
 
    switch (sock->socks_state) {
    case SOCKS_CONNECTING_PROXY:
@@ -479,8 +479,9 @@ netasync_socks_handler(struct netasync_socket *sock)
       buf = sock->socksRecvBuf;
 
       if (buf[0] != 5 || buf[1] != 0) {
-         NOT_TESTED();
-         return;
+         Log(LGPFX" failed to proxy-connect: %02x %02x\n", buf[0], buf[1]);
+         sock->err = EINVAL;
+         goto exit;
       }
 
       slen = sizeof sock->socksAddr.sin_addr;
@@ -508,22 +509,27 @@ netasync_socks_handler(struct netasync_socket *sock)
       buf = sock->socksRecvBuf;
       if (buf[0] != 5) {
          Log(LGPFX" failed to accept request: %02x\n", buf[0]);
-         return;
+         sock->err = EINVAL;
+         goto exit;
       }
       if (buf[1] != 0) {
          Log(LGPFX" %s: socks5 proxy error: %s (%d)\n",
              sock->hostname, socks5_err2str(buf[1]), buf[1]);
-         return;
+         sock->err = EINVAL;
+         goto exit;
       }
       ASSERT(buf[2] == 0);
-      ASSERT(sock->connectCb);
-      sock->connectCb(sock, sock->connectCbData, sock->err);
-      break;
+      goto exit;
    default:
       NOT_REACHED();
       return;
    }
    sock->socks_state++;
+   return;
+
+exit:
+   ASSERT(sock->connectCb);
+   sock->connectCb(sock, sock->connectCbData, sock->err);
 }
 
 
@@ -920,6 +926,7 @@ netasync_receive(struct netasync_socket *sock,
    LOG(1, (LGPFX" Receiving on s=%p fd=%d -- buf %p:%zu\n",
        sock, sock->fd, buf, len));
 
+   ASSERT(sock->err == 0);
    ASSERT(sock->recvBuf == NULL);
    ASSERT(sock->recvBufLen == 0);
    ASSERT(buf);

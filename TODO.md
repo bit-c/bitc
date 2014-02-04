@@ -12,9 +12,10 @@
 * stealth address,
 * coinjoin ability,
 * BIP32 deterministic wallet,
-* TOR support,
 * handle json style commands via socket,
-* editor for some kind of coin-selection tool.
+* editor for some kind of coin-selection tool. Consider adding a flag in
+  wallet.cfg that says whether coins on an address are spendable.
+* ability to pay to P2SH/multisig address,
 
 #### P0
 * in case of chain re-org: make sure that only the tx on the 'best chain' are
