@@ -8,6 +8,7 @@ bitc is a *thin* SPV bitcoin client.
 * home grown poll loop,
 * home grown bitcoin engine,
 * supports encrypted wallet,
+* supports connecting via Tor/Socks5,
 * multi-threaded,
 * valgrind clean.
 
@@ -122,12 +123,19 @@ later.
 
 #### TOR / SOCKS5 support
 
-Bitc can use a socks5 proxy to connect to peers. You just need to put the
-entry:
+Bitc can route all outgoing TCP connections through a socks5 proxy. Since TOR
+implements a SOCKS5 proxy, you just need to put the entry:
 ```
 	network.useSocks5="true"
 ```
-in your main config file, usually located at `~/.bitc/main.cfg`.
+in your main config file to use bitc over Tor (for a local Tor client). If the
+Tor proxy is not running locally, you need to modify the config options:
+```
+ 	socks5.hostname="localhost"
+	socks5.port=9050
+```
+.. in the file  `~/.bitc/main.cfg`. The default `hostname:port` is
+`localhost:9050`.
 
 
 ---
