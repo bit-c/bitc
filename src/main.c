@@ -973,7 +973,13 @@ btc_init(struct secure_area *passphrase,
 
    if (config_getbool(btc->config, FALSE, "network.useSocks5")) {
       btc->socks5_proxy = config_getstring(btc->config, "localhost", "socks5.hostname");
-      btc->socks5_port  = config_getint64(btc->config, 9050, "socks5.port");
+      btc->socks5_port  = config_getint64(btc->config,
+#ifdef linux
+                                          9050,
+#else
+                                          9150,
+#endif
+                                          "socks5.port");
       Log(LGPFX" Using SOCKS5 proxy %s:%u.\n",
           btc->socks5_proxy, btc->socks5_port);
    }
