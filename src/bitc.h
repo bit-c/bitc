@@ -52,6 +52,9 @@ struct BITCApp {
    int                      eventFd;
    int                      notifyFd;
    struct circlist_item    *reqList;
+
+   char                    *socks5_proxy;
+   uint16                   socks5_port;
 };
 
 extern struct BITCApp *btc;

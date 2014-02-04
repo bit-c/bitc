@@ -515,24 +515,38 @@ ncui_status_update(bool update)
       wattroff(win, PAIR_CYAN);
    }
 
+   char *proxyStr = NULL;
+   if (btc->socks5_proxy) {
+      proxyStr = "[SOCKS5]";
+   }
+
    char *wltStr = NULL;
    int attr;
    switch (btc->wallet_state) {
    case WALLET_PLAIN:
       attr = PAIR_RED;
-      wltStr = "(unencrypted)";
+      wltStr = "[unencrypted]";
       break;
    case WALLET_ENCRYPTED_LOCKED:
       attr = PAIR_GREEN;
-      wltStr = "(locked)";
+      wltStr = "[locked]";
       break;
    case WALLET_ENCRYPTED_UNLOCKED:
       attr = PAIR_RED;
-      wltStr = "(unlocked)";
+      wltStr = "[unlocked]";
       break;
    default:
       break;
    }
+
+   if (proxyStr) {
+      size_t wlen = wltStr ? strlen(wltStr) : 0;
+      wattron(win, PAIR_GREEN);
+      mvwprintw(win, LINES - 2, COLS - strlen(ncui->timeStr) - 3 - wlen - strlen(proxyStr),
+                "%s", proxyStr);
+      wattroff(win, PAIR_GREEN);
+   }
+
    if (wltStr) {
       wattron(win, attr);
       mvwprintw(win, LINES - 2, COLS - strlen(ncui->timeStr) - 3 - strlen(wltStr),

@@ -971,6 +971,13 @@ btc_init(struct secure_area *passphrase,
    btc_req_init();
    netasync_init(btc->poll);
 
+   if (config_getbool(btc->config, FALSE, "network.useSocks5")) {
+      btc->socks5_proxy = config_getstring(btc->config, "localhost", "socks5.hostname");
+      btc->socks5_port  = config_getint64(btc->config, 9050, "socks5.port");
+      Log(LGPFX" Using SOCKS5 proxy %s:%u.\n",
+          btc->socks5_proxy, btc->socks5_port);
+   }
+
    bitcui_set_status("loading addrbook..");
    addrbook_open(btc->config, &btc->book);
 
@@ -1027,6 +1034,7 @@ btc_exit(void)
    config_free(btc->txLabelsCfg);
    config_free(btc->contactsCfg);
    config_free(btc->config);
+   free(btc->socks5_proxy);
 }
 
 

@@ -120,6 +120,18 @@ later.
 
 ---
 
+#### TOR / SOCKS5 support
+
+Bitc can use a socks5 proxy to connect to peers. You just need to put the
+entry:
+```
+	network.useSocks5="true"
+```
+in your main config file, usually located at `~/.bitc/main.cfg`.
+
+
+---
+
 #### Problem?
 
 There are still a variety of things that need to be fixed or implemented (cf [TODO

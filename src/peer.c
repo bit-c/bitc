@@ -1234,8 +1234,9 @@ peer_add(struct peer_addr *paddr,
    peer->hostname = netasync_addr2str(&peer->saddr);
    LOG(1, (LGPFX" %s: connecting to %s.\n", peer->name, peer->hostname));
    netasync_set_errorhandler(peer->sock, peer_error_cb, peer);
-   if (config_getbool(btc->config, FALSE, "network.useSocks5")) {
-      netasync_use_socks(peer->sock, "localhost", 9050);
+
+   if (btc->socks5_proxy) {
+      netasync_use_socks(peer->sock, btc->socks5_proxy, btc->socks5_port);
    }
    netasync_connect(peer->sock, &peer->saddr,
                     15 /* 15 sec connect timeout */,
