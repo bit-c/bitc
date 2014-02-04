@@ -226,7 +226,7 @@ ipinfo_resolve_geo_cb(void *clientData)
    }
 
    ipStr = netasync_addr2str(&entry->addr);
-   snprintf(url, sizeof url, "http://freegeoip.net/json/%s", ipStr);
+   snprintf(url, sizeof url, "https://freegeoip.net/json/%s", ipStr);
    buf = buff_alloc();
 
    h = curl_easy_init();
@@ -234,6 +234,16 @@ ipinfo_resolve_geo_cb(void *clientData)
    curl_easy_setopt(h, CURLOPT_URL, url);
    curl_easy_setopt(h, CURLOPT_WRITEFUNCTION, ipinfo_curl_write_cb);
    curl_easy_setopt(h, CURLOPT_WRITEDATA, buf);
+   /*
+    * We're using https to connect to freegeoip.net, but since the CA
+    * certification bundle may not be properly set-up on the host, we skip the
+    * verification phase.  It's not quite as secure as it could potentially be,
+    * but the security improvement over a straight http connection channel is
+    * still significant.
+    *
+    *   http://curl.haxx.se/docs/sslcerts.html
+    */
+   curl_easy_setopt(h, CURLOPT_SSL_VERIFYPEER, 0);
 
    /*
     * Fix for bug in older versions of libcurl:
