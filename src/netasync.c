@@ -36,6 +36,17 @@ struct netasync_send_ctx {
 };
 
 
+enum SocksState {
+   SOCKS_INIT,
+   SOCKS_CONNECTING_PROXY,
+   SOCKS_CONNECTED_PROXY_RECV,
+   SOCKS_CONNECTED_PROXY,
+   SOCKS_CONNECTED_REMOTE,
+   SOCKS_CONNECTED_REMOTE_RECV,
+   SOCKS_CONNECTED_OK,
+};
+
+
 struct netasync_socket {
    uint64                     magic;
    int                        fd;
@@ -47,6 +58,13 @@ struct netasync_socket {
    time_t                     connectTS;
    bool                       connect_timeout;
    bool                       connect_async;
+
+   bool                       useSocks5;
+   char                      *socksHostname;
+   uint16                     socksPort;
+   uint8                      socksRecvBuf[16];
+   struct sockaddr_in         socksAddr;
+   enum SocksState            socks_state;
 
    netasync_callback         *errorCb;
    void                      *errorCbData;
@@ -73,6 +91,60 @@ static struct {
 
 static void netasync_connected(void *clientData);
 static void netasync_connect_timeout_cb(void *clientData);
+static void netasync_socks_handler(struct netasync_socket *sock);
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * socks5_err2str --
+ *
+ *      http://tools.ietf.org/rfc/rfc1928.txt
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static const char *
+socks5_err2str(int e)
+{
+   switch (e) {
+   case 0:  return "succeeded";
+   case 1:  return "general SOCKS server failure";
+   case 2:  return "connection not allowed by ruleset";
+   case 3:  return "network unreachable";
+   case 4:  return "host unreachable";
+   case 5:  return "connection refused";
+   case 6:  return "TTL expired";
+   case 7:  return "command not supported";
+   case 8:  return "address type not supported";
+   case 9:  return "to X'FF' unassigned";
+   }
+   return "XXX";
+}
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * socks5_state2str --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static const char *
+socks5_state2str(enum SocksState state)
+{
+   switch (state) {
+   case SOCKS_INIT:                  return "SOCKS_INIT";
+   case SOCKS_CONNECTING_PROXY:      return "SOCKS_CONNECTING_PROXY";
+   case SOCKS_CONNECTED_PROXY_RECV:  return "SOCKS_CONNECTED_PROXY_RECV";
+   case SOCKS_CONNECTED_PROXY:       return "SOCKS_CONNECTED_PROXY";
+   case SOCKS_CONNECTED_REMOTE:      return "SOCKS_CONNECTED_REMOTE";
+   case SOCKS_CONNECTED_REMOTE_RECV: return "SOCKS_CONNECTED_REMOTE_RECV";
+   case SOCKS_CONNECTED_OK:          return "SOCKS_CONNECTED_OK";
+   }
+   return NULL;
+}
 
 
 /*
@@ -279,6 +351,8 @@ netasync_create(void)
    sock->sendCtxTail = &sock->sendCtxList;
    sock->magic       = SOCK_MAGIC;
    sock->fd          = -1;
+   sock->useSocks5   = 0;
+   sock->socks_state = SOCKS_INIT;
 
    netasync.sockets++;
 
@@ -332,6 +406,130 @@ netasync_getsocket_errno(const struct netasync_socket *sock)
 /*
  *-------------------------------------------------------------------------
  *
+ * netasync_sock_recv_cb --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static void
+netasync_sock_recv_cb(struct netasync_socket *sock,
+                      void                   *recvBuf0,
+                      size_t                  len,
+                      void                   *clientdata)
+{
+   netasync_socks_handler(sock);
+}
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * netasync_sock_send_cb --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static void
+netasync_sock_send_cb(struct netasync_socket *sock,
+                      void                   *clientData,
+                      int                     err)
+{
+   if (err != 0) {
+      NOT_TESTED();
+      return;
+   }
+   netasync_socks_handler(sock);
+}
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * netasync_socks_handler --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static void
+netasync_socks_handler(struct netasync_socket *sock)
+{
+   uint8 *buf;
+   size_t slen;
+   int res;
+
+   LOG(1, (LGPFX" %s:%u -- %s\n",
+           __FUNCTION__, __LINE__,
+           socks5_state2str(sock->socks_state)));
+
+   switch (sock->socks_state) {
+   case SOCKS_CONNECTING_PROXY:
+      buf = safe_malloc(3);
+      buf[0] = 5; // version 5
+      buf[1] = 1; // just one authentication method
+      buf[2] = 0; // no-auth
+
+      res = netasync_send(sock, buf, 3, netasync_sock_send_cb, NULL);
+      ASSERT(res == 0);
+      break;
+   case SOCKS_CONNECTED_PROXY_RECV:
+      netasync_receive(sock, sock->socksRecvBuf, 2, 0,
+                       netasync_sock_recv_cb, NULL);
+      break;
+   case SOCKS_CONNECTED_PROXY:
+      buf = sock->socksRecvBuf;
+
+      if (buf[0] != 5 || buf[1] != 0) {
+         NOT_TESTED();
+         return;
+      }
+
+      slen = sizeof sock->socksAddr.sin_addr;
+      buf = safe_malloc(6 + slen);
+
+      buf[0] = 5; // socks v5
+      buf[1] = 1; // establish tcp/ip connection
+      buf[2] = 0; // reserved
+      buf[3] = 1; // IPv4
+
+      memcpy(buf + 4, &sock->socksAddr.sin_addr.s_addr, slen);
+
+      buf[4 + slen] = sock->socksAddr.sin_port & 0xff;
+      buf[5 + slen] = sock->socksAddr.sin_port >> 8;
+
+      res = netasync_send(sock, buf, 6 + slen, netasync_sock_send_cb, NULL);
+      ASSERT(res == 0);
+      break;
+   case SOCKS_CONNECTED_REMOTE:
+      // 10 = 6 + slen
+      netasync_receive(sock, sock->socksRecvBuf, 10, 0,
+                       netasync_sock_recv_cb, NULL);
+      break;
+   case SOCKS_CONNECTED_REMOTE_RECV:
+      buf = sock->socksRecvBuf;
+      if (buf[0] != 5) {
+         Log(LGPFX" failed to accept request: %02x\n", buf[0]);
+         return;
+      }
+      if (buf[1] != 0) {
+         Log(LGPFX" %s: socks5 proxy error: %s (%d)\n",
+             sock->hostname, socks5_err2str(buf[1]), buf[1]);
+         return;
+      }
+      ASSERT(buf[2] == 0);
+      ASSERT(sock->connectCb);
+      sock->connectCb(sock, sock->connectCbData, sock->err);
+      break;
+   default:
+      NOT_REACHED();
+      return;
+   }
+   sock->socks_state++;
+}
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
  * netasync_connected --
  *
  *-------------------------------------------------------------------------
@@ -344,8 +542,8 @@ netasync_connected(void *clientData)
 
    ASSERT(sock->magic == SOCK_MAGIC);
 
-   LOG(1, (LGPFX" %s -- %s: fd=%d err = %d\n", __FUNCTION__, sock->hostname,
-           sock->fd, sock->err));
+   LOG(1, (LGPFX" %s -- %s: fd=%d err = %d\n",
+           __FUNCTION__, sock->hostname, sock->fd, sock->err));
 
    sock->connect_async = 0;
 
@@ -363,8 +561,8 @@ netasync_connected(void *clientData)
 
       if (sock->err != 0) {
          Log(LGPFX" failed to connect fd=%d to %s (%s) - %s (%d)\n",
-                 sock->fd, sock->hostname, latStr,
-                 strerror(sock->err), sock->err);
+             sock->fd, sock->hostname, latStr,
+             strerror(sock->err), sock->err);
       } else {
          Log(LGPFX" connected to %s fd=%d (%s)\n",
              sock->hostname, sock->fd, latStr);
@@ -372,7 +570,9 @@ netasync_connected(void *clientData)
       free(latStr);
    }
 
-   if (sock->connectCb) {
+   if (sock->useSocks5) {
+      netasync_socks_handler(sock);
+   } else if (sock->connectCb) {
       sock->connectCb(sock, sock->connectCbData, sock->err);
    }
 }
@@ -387,8 +587,8 @@ netasync_connected(void *clientData)
  */
 
 int
-netasync_resolve(const char *hostname,
-                 uint16 port,
+netasync_resolve(const char         *hostname,
+                 uint16              port,
                  struct sockaddr_in *addr)
 {
    struct addrinfo hints;
@@ -483,17 +683,36 @@ netasync_connect_timeout_cb(void *clientData)
 /*
  *-------------------------------------------------------------------------
  *
+ * netasync_use_socks --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+void
+netasync_use_socks(struct netasync_socket *sock,
+                   const char             *hostname,
+                   short                   port)
+{
+   sock->useSocks5 = 1;
+   sock->socksPort = port;
+   sock->socksHostname = safe_strdup(hostname);
+}
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
  * netasync_connect --
  *
  *-------------------------------------------------------------------------
  */
 
 int
-netasync_connect(struct netasync_socket *sock,
+netasync_connect(struct netasync_socket   *sock,
                  const struct sockaddr_in *addr,
-                 int timeout_sec,
-                 netasync_callback *cb,
-                 void *clientData)
+                 int                       timeout_sec,
+                 netasync_callback        *cb,
+                 void                     *clientData)
 {
    int res;
 
@@ -525,9 +744,24 @@ netasync_connect(struct netasync_socket *sock,
       goto exit;
    }
 
-   res = connect(sock->fd, (struct sockaddr *)addr, sizeof *addr);
-   if (res == 0) {
-      goto exit;
+   if (sock->useSocks5) {
+      struct sockaddr_in a;
+
+      res = netasync_resolve(sock->socksHostname, sock->socksPort, &a);
+      if (res != 0) {
+         goto exit;
+      }
+      res = connect(sock->fd, (struct sockaddr *)&a, sizeof a);
+      if (res == 0) {
+         goto exit;
+      }
+      sock->socksAddr = *addr;
+      sock->socks_state = SOCKS_CONNECTING_PROXY;
+   } else {
+      res = connect(sock->fd, (struct sockaddr *)addr, sizeof *addr);
+      if (res == 0) {
+         goto exit;
+      }
    }
    if (!cb || errno != EINPROGRESS) {
       sock->err = errno;
@@ -675,11 +909,11 @@ netasync_receive_cb(void *clientData)
 
 int
 netasync_receive(struct netasync_socket *sock,
-                 void *buf,
-                 size_t len,
-                 bool partial,
+                 void                   *buf,
+                 size_t                  len,
+                 bool                    partial,
                  netasync_recv_callback *cb,
-                 void *clientData)
+                 void                   *clientData)
 {
    ASSERT(sock->magic == SOCK_MAGIC);
 
@@ -813,10 +1047,10 @@ netasync_send_ready_cb(void *clientData)
 
 int
 netasync_send(struct netasync_socket *sock,
-              const void *buf,
-              size_t len,
-              netasync_callback *callback,
-              void *clientData)
+              const void             *buf,
+              size_t                  len,
+              netasync_callback      *callback,
+              void                   *clientData)
 {
    struct netasync_send_ctx *ctx;
    bool newSend;
@@ -915,6 +1149,7 @@ netasync_close(struct netasync_socket *sock)
       sock->fd = -1;
    }
    free(sock->hostname);
+   free(sock->socksHostname);
    memset(sock, 0xff, sizeof *sock);
    free(sock);
 }

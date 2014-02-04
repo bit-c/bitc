@@ -1105,7 +1105,7 @@ str_printf_bytes(const char *pfx,
 void
 Log_Bytes(const char *pfx,
           const void *data,
-          size_t len)
+          size_t      len)
 {
    char str[16384];
 

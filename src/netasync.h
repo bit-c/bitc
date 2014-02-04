@@ -48,5 +48,8 @@ int netasync_connect(struct netasync_socket *socket,
                      int timeout_sec,
                      netasync_callback *cb,
                      void *clientData);
+void
+netasync_use_socks(struct netasync_socket *sock,
+                   const char *hostname, short port);
 
 #endif /* __NETASYNC_H__ */
