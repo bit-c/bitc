@@ -135,7 +135,7 @@ Tor proxy is not running locally, you need to modify the config options:
 	socks5.port=9050
 ```
 .. in the file  `~/.bitc/main.cfg`. The default `hostname:port` is
-`localhost:9050`.
+`localhost:9050` on linux, and `localhost:9150` on mac.
 
 
 ---
