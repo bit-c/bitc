@@ -245,6 +245,12 @@ ipinfo_resolve_geo_cb(void *clientData)
     */
    curl_easy_setopt(h, CURLOPT_SSL_VERIFYPEER, 0);
 
+   if (btc->socks5_proxy) {
+      curl_easy_setopt(h, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+      curl_easy_setopt(h, CURLOPT_PROXY,     btc->socks5_proxy);
+      curl_easy_setopt(h, CURLOPT_PROXYPORT, btc->socks5_port);
+   }
+
    /*
     * Fix for bug in older versions of libcurl:
     * https://stackoverflow.com/questions/9191668/error-longjmp-causes-uninitialized-stack-frame
