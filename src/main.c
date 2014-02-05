@@ -1090,7 +1090,7 @@ int main(int argc, char *argv[])
    bool encrypt = 0;
    bool getpass = 0;
    int res = 0;
-   char c;
+   int c;
 
    static const struct option long_opts [] = {
       { "address",      no_argument,        0,  'a' },
