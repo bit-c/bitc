@@ -110,40 +110,6 @@ blockstore_get_height(const struct blockstore *bs)
 /*
  *-------------------------------------------------------------------------
  *
- * blockstore_get_lowest --
- *
- *-------------------------------------------------------------------------
- */
-
-void
-blockstore_get_lowest(struct blockstore *bs,
-                      const uint256 *hash0,
-                      const uint256 *hash1,
-                      uint256 *hash)
-{
-   int height0;
-   int height1;
-
-   if (uint256_iszero(hash0) || uint256_iszero(hash1)) {
-      memset(hash, 0, sizeof *hash);
-      NOT_TESTED();
-      return;
-   }
-
-   height0 = blockstore_get_block_height(bs, hash0);
-   height1 = blockstore_get_block_height(bs, hash1);
-
-   if (height0 < height1) {
-      memcpy(hash, hash0, sizeof *hash0);
-   } else {
-      memcpy(hash, hash1, sizeof *hash1);
-   }
-}
-
-
-/*
- *-------------------------------------------------------------------------
- *
  * blockstore_get_highest --
  *
  *-------------------------------------------------------------------------
@@ -169,6 +135,8 @@ blockstore_get_highest(struct blockstore *bs,
 
    height0 = blockstore_get_block_height(bs, hash0);
    height1 = blockstore_get_block_height(bs, hash1);
+   ASSERT(height0 > 0);
+   ASSERT(height1 > 0);
 
    if (height0 < height1) {
       memcpy(hash, hash1, sizeof *hash1);
