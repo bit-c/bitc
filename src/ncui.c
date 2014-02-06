@@ -860,7 +860,7 @@ ncui_tx_form_process(struct ncui *ncui)
 
    bitcui_set_status("TX: %.8f BTC to %s", desc->total_value / ONE_BTC, addr);
 
-   btc_req_tx(desc);
+   bitc_req_tx(desc);
 }
 
 
@@ -1089,7 +1089,7 @@ here:
    case '`':
    case 'q':
       bitcui_set_status("exit requested.");
-      btc_req_stop();
+      bitc_req_stop();
       break;
    case KEY_RESIZE:
       NOT_TESTED_ONCE();
@@ -1902,7 +1902,7 @@ ncui_input_kbd_cb(struct ncui *ncui,
    if (strcmp(cmd, ":q") == 0 ||
        strcmp(cmd, ":q!") == 0) {
       NOT_TESTED();
-      btc_req_stop();
+      bitc_req_stop();
    } else if (strncmp(cmd, ":p ", 3) == 0) {
       NOT_TESTED();
       bitcui_set_status("hash: %s", cmd + 3);

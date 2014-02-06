@@ -15,7 +15,6 @@
 #include "circlist.h"
 #include "hashtable.h"
 #include "buff.h"
-#include "bloom.h"
 
 #include "btc-message.h"
 #include "peer.h"
@@ -275,12 +274,11 @@ peer_send_getheaders(struct peer *peer)
 static int
 peer_send_filterload(struct peer *peer)
 {
-   struct bloom_filter *f = btc->filter;
    btc_msg_filterload fl;
    int res;
 
-   bloom_getinfo(f, &fl.filter, &fl.filterSize, &fl.numHashFuncs,
-                 &fl.tweak);
+   wallet_get_bloom_filter_info(btc->wallet, &fl.filter, &fl.filterSize,
+                                &fl.numHashFuncs, &fl.tweak);
 
    fl.flags = BLOOM_UPDATE_P2PUBKEY_ONLY;
 

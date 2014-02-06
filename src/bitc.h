@@ -39,7 +39,6 @@ struct BITCApp {
    struct config           *txLabelsCfg;
    struct blockstore       *blockStore;
    struct wallet           *wallet;
-   struct bloom_filter     *filter;
    struct addrbook         *book;
    struct ncui             *ui;
    struct peergroup        *peerGroup;
@@ -60,8 +59,8 @@ struct BITCApp {
 extern struct BITCApp *btc;
 extern bool bitc_testing;
 
-void btc_req_stop(void);
-void btc_req_tx(struct btc_tx_desc *tx_desc);
+void bitc_req_stop(void);
+void bitc_req_tx(struct btc_tx_desc *tx_desc);
 
 /*
  *-------------------------------------------------------------------

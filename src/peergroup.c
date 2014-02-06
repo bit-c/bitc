@@ -341,7 +341,7 @@ peergroup_download_complete(void)
    peergroup_download_progress();
 
    if (btc->updateAndExit) {
-      btc_req_stop();
+      bitc_req_stop();
    } else {
       Log(LGPFX" %s -- BITC_STATE_READY.\n", __FUNCTION__);
       btc->state = BITC_STATE_READY;

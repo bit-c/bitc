@@ -76,7 +76,7 @@
 
 #### P0
 * add a ncurses panel object that can be used to store and select arbitrary
-   lines, use this to implement:
+  lines, use this to implement:
 * panel block: ability to select block and display detailed info,
 * panel tx: ability to select tx and display detailed info,
 * panel contacts: show ascii qr code,

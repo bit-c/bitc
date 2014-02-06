@@ -27,7 +27,6 @@
 #include "poll.h"
 #include "netasync.h"
 #include "key.h"
-#include "bloom.h"
 #include "addrbook.h"
 #include "serialize.h"
 #include "file.h"
@@ -243,13 +242,13 @@ bitc_add_address(const char         *desc,
 /*
  *---------------------------------------------------------------------
  *
- * btc_bye --
+ * bitc_bye --
  *
  *---------------------------------------------------------------------
  */
 
 static void
-btc_bye(void)
+bitc_bye(void)
 {
    printf("Contribute! https://github.com/bit-c/bitc\n");
 }
@@ -258,15 +257,15 @@ btc_bye(void)
 /*
  *---------------------------------------------------------------------
  *
- * btc_version_and_exit --
+ * bitc_version_and_exit --
  *
  *---------------------------------------------------------------------
  */
 
 static void
-btc_version_and_exit(void)
+bitc_version_and_exit(void)
 {
-   printf("btc: %s.\n"
+   printf("bitc: %s.\n"
           " - compiled on %s at %s,\n"
           " - version: %s.\n",
           BTC_CLIENT_DESC,
@@ -280,13 +279,13 @@ btc_version_and_exit(void)
 /*
  *---------------------------------------------------------------------
  *
- * btc_usage --
+ * bitc_usage --
  *
  *---------------------------------------------------------------------
  */
 
 static void
-btc_usage(void)
+bitc_usage(void)
 {
    printf("bitc: %s.\n"
           "Options:\n"
@@ -308,13 +307,13 @@ btc_usage(void)
 /*
  *----------------------------------------------------------------
  *
- * btc_req_notify --
+ * bitc_req_notify --
  *
  *----------------------------------------------------------------
  */
 
 static void
-btc_req_notify(void)
+bitc_req_notify(void)
 {
    uint8 val = 1;
    ssize_t res;
@@ -341,37 +340,37 @@ bitc_sigint_handler(int sig)
       Warning("Signal %u received. Exiting..\n", sig);
    }
    btc->stop = 2;
-   btc_req_notify();
+   bitc_req_notify();
 }
 
 
 /*
  *---------------------------------------------------------------------
  *
- * btc_log_sslversion --
+ * bitc_log_sslversion --
  *
  *---------------------------------------------------------------------
  */
 
 static void
-btc_log_sslversion(void)
+bitc_log_sslversion(void)
 {
    const char *sslVersion = SSLeay_version(SSLEAY_VERSION);
-   Log("Using %s.\n", sslVersion);
+   Log(LGPFX" using %s.\n", sslVersion);
 }
 
 
 /*
  *------------------------------------------------------------------------
  *
- * btc_check_create_file --
+ * bitc_check_create_file --
  *
  *------------------------------------------------------------------------
  */
 
 static int
-btc_check_create_file(const char *filename,
-                      const char *label)
+bitc_check_create_file(const char *filename,
+                       const char *label)
 {
    int res;
 
@@ -398,13 +397,13 @@ btc_check_create_file(const char *filename,
 /*
  *------------------------------------------------------------------------
  *
- * btc_check_config --
+ * bitc_check_config --
  *
  *------------------------------------------------------------------------
  */
 
 static int
-btc_check_config(void)
+bitc_check_config(void)
 {
    char *btcDir;
    char *cfgPath;
@@ -422,7 +421,7 @@ btc_check_config(void)
    if (!file_exists(btcDir) || !file_exists(cfgPath)) {
       printf("\nIt looks like you're a new user. Welcome!\n"
              "\n"
-             "Note that btc uses the directory: ~/.bitc to store:\n"
+             "Note that bitc uses the directory: ~/.bitc to store:\n"
              " - block headers:        ~/.bitc/headers.dat     -- ~ 20 MB\n"
              " - peer IP addresses:    ~/.bitc/peers.dat       --  ~ 2 MB\n"
              " - transaction database: ~/.bitc/txdb            --  < 1 MB\n"
@@ -447,13 +446,13 @@ btc_check_config(void)
          goto exit;
       }
    }
-   btc_check_create_file(cfgPath, "config");
-   btc_check_create_file(txPath, "tx-labels");
+   bitc_check_create_file(cfgPath, "config");
+   bitc_check_create_file(txPath, "tx-labels");
 
    if (!file_exists(ctcPath)) {
       struct config *cfg;
 
-      btc_check_create_file(ctcPath, "contacts");
+      bitc_check_create_file(ctcPath, "contacts");
 
       cfg = config_create();
       config_setstring(cfg, "1PBP4S44b1ro3kD6LQhBYnsF3fAp1HYPf2", "contact0.addr");
@@ -489,13 +488,13 @@ exit:
 /*
  *----------------------------------------------------------------
  *
- * btc_check_wallet --
+ * bitc_check_wallet --
  *
  *----------------------------------------------------------------
  */
 
 static int
-btc_check_wallet(void)
+bitc_check_wallet(void)
 {
    char *btc_addr = NULL;
    char *wltPath;
@@ -535,13 +534,13 @@ exit:
 /*
  *----------------------------------------------------------------
  *
- * btc_load_misc_config --
+ * bitc_load_misc_config --
  *
  *----------------------------------------------------------------
  */
 
 static void
-btc_load_misc_config(void)
+bitc_load_misc_config(void)
 {
    char *defaultPath;
    char *home;
@@ -581,14 +580,14 @@ btc_load_misc_config(void)
 /*
  *----------------------------------------------------------------
  *
- * btc_load_config --
+ * bitc_load_config --
  *
  *----------------------------------------------------------------
  */
 
 static int
-btc_load_config(struct config **config,
-                const char     *configPath)
+bitc_load_config(struct config **config,
+                 const char     *configPath)
 {
    char *defaultPath = NULL;
    const char *path;
@@ -614,34 +613,13 @@ btc_load_config(struct config **config,
 /*
  *----------------------------------------------------------------
  *
- * btc_filter_init --
+ * bitc_poll_exit --
  *
  *----------------------------------------------------------------
  */
 
 static void
-btc_filter_init(void)
-{
-   struct bloom_filter *f;
-
-   f = bloom_create(10, 0.001);
-
-   wallet_update_filter(btc->wallet, f);
-
-   btc->filter = f;
-}
-
-
-/*
- *----------------------------------------------------------------
- *
- * btc_poll_exit --
- *
- *----------------------------------------------------------------
- */
-
-static void
-btc_poll_exit(void)
+bitc_poll_exit(void)
 {
    poll_destroy(btc->poll);
    btc->poll = NULL;
@@ -651,13 +629,13 @@ btc_poll_exit(void)
 /*
  *----------------------------------------------------------------
  *
- * btc_poll_init --
+ * bitc_poll_init --
  *
  *----------------------------------------------------------------
  */
 
 static void
-btc_poll_init(void)
+bitc_poll_init(void)
 {
    btc->poll = poll_create();
 }
@@ -666,13 +644,13 @@ btc_poll_init(void)
 /*
  *----------------------------------------------------------------
  *
- * btc_req_enqueue --
+ * bitc_req_enqueue --
  *
  *----------------------------------------------------------------
  */
 
 static void
-btc_req_enqueue(struct btc_req *req)
+bitc_req_enqueue(struct btc_req *req)
 {
    ASSERT(req);
    ASSERT(btc->lock);
@@ -681,20 +659,20 @@ btc_req_enqueue(struct btc_req *req)
    circlist_queue_item(&btc->reqList, &req->item);
    mutex_unlock(btc->lock);
 
-   btc_req_notify();
+   bitc_req_notify();
 }
 
 
 /*
  *----------------------------------------------------------------
  *
- * btc_req_alloc --
+ * bitc_req_alloc --
  *
  *----------------------------------------------------------------
  */
 
 static struct btc_req *
-btc_req_alloc(enum btc_req_type type)
+bitc_req_alloc(enum btc_req_type type)
 {
    struct btc_req*req;
 
@@ -710,34 +688,34 @@ btc_req_alloc(enum btc_req_type type)
 /*
  *----------------------------------------------------------------
  *
- * btc_req_tx --
+ * bitc_req_tx --
  *
  *----------------------------------------------------------------
  */
 
 void
-btc_req_tx(struct btc_tx_desc *tx)
+bitc_req_tx(struct btc_tx_desc *tx)
 {
    struct btc_req *req;
 
    Log(LGPFX" requesting tx: %.8f BTC to %s.\n",
        tx->total_value / ONE_BTC, tx->dst[0].addr);
-   req = btc_req_alloc(BTC_REQ_TX);
+   req = bitc_req_alloc(BTC_REQ_TX);
    req->clientData = tx;
-   btc_req_enqueue(req);
+   bitc_req_enqueue(req);
 }
 
 
 /*
  *----------------------------------------------------------------
  *
- * btc_req_stop --
+ * bitc_req_stop --
  *
  *----------------------------------------------------------------
  */
 
 void
-btc_req_stop(void)
+bitc_req_stop(void)
 {
    struct btc_req *req;
 
@@ -748,21 +726,21 @@ btc_req_stop(void)
     * processing. Cf blockstore_load_etc.
     */
    btc->stop = 1;
-   req = btc_req_alloc(BTC_REQ_STOP);
-   btc_req_enqueue(req);
+   req = bitc_req_alloc(BTC_REQ_STOP);
+   bitc_req_enqueue(req);
 }
 
 
 /*
  *----------------------------------------------------------------
  *
- * btc_transmit_tx --
+ * bitc_transmit_tx --
  *
  *----------------------------------------------------------------
  */
 
 static void
-btc_transmit_tx(struct btc_tx_desc *tx_desc)
+bitc_transmit_tx(struct btc_tx_desc *tx_desc)
 {
    struct btc_msg_tx tx;
    int res;
@@ -794,13 +772,13 @@ btc_transmit_tx(struct btc_tx_desc *tx_desc)
 /*
  *----------------------------------------------------------------
  *
- * btc_process_events --
+ * bitc_process_events --
  *
  *----------------------------------------------------------------
  */
 
 static void
-btc_process_events(void)
+bitc_process_events(void)
 {
    /*
     * If we got a CTRL-C, btc->stop is set to 2. We transition automatically to
@@ -828,7 +806,7 @@ btc_process_events(void)
       case BTC_REQ_TX:
          Log(LGPFX" %s -- initiating tx.\n", __FUNCTION__);
          struct btc_tx_desc *tx_desc = req->clientData;
-         btc_transmit_tx(tx_desc);
+         bitc_transmit_tx(tx_desc);
          free(tx_desc);
          break;
       default:
@@ -844,13 +822,13 @@ btc_process_events(void)
 /*
  *----------------------------------------------------------------
  *
- * btc_req_cb --
+ * bitc_req_cb --
  *
  *----------------------------------------------------------------
  */
 
 static void
-btc_req_cb(void *clientData)
+bitc_req_cb(void *clientData)
 {
    ssize_t res;
 
@@ -863,9 +841,7 @@ btc_req_cb(void *clientData)
    ASSERT(res == 0 || errno == EAGAIN);
 
    mutex_lock(btc->lock);
-
-   btc_process_events();
-
+   bitc_process_events();
    mutex_unlock(btc->lock);
 }
 
@@ -873,13 +849,13 @@ btc_req_cb(void *clientData)
 /*
  *----------------------------------------------------------------
  *
- * btc_req_exit --
+ * bitc_req_exit --
  *
  *----------------------------------------------------------------
  */
 
 static void
-btc_req_exit(void)
+bitc_req_exit(void)
 {
    bool s;
 
@@ -888,7 +864,7 @@ btc_req_exit(void)
    }
 
    s = poll_callback_device_remove(btc->poll, btc->eventFd, 1, 0, 1,
-                                   btc_req_cb, NULL);
+                                   bitc_req_cb, NULL);
    ASSERT(s);
 
    close(btc->eventFd);
@@ -902,13 +878,13 @@ btc_req_exit(void)
 /*
  *----------------------------------------------------------------
  *
- * btc_req_init --
+ * bitc_req_init --
  *
  *----------------------------------------------------------------
  */
 
 static int
-btc_req_init(void)
+bitc_req_init(void)
 {
    int fd[2];
    int flags;
@@ -934,7 +910,7 @@ btc_req_init(void)
       NOT_TESTED();
       return res;
    }
-   poll_callback_device(btc->poll, btc->eventFd, 1, 0, 1, btc_req_cb, NULL);
+   poll_callback_device(btc->poll, btc->eventFd, 1, 0, 1, bitc_req_cb, NULL);
    btc->notifyInit = 1;
 
    return 0;
@@ -944,17 +920,17 @@ btc_req_init(void)
 /*
  *----------------------------------------------------------------
  *
- * btc_init --
+ * bitc_init --
  *
  *----------------------------------------------------------------
  */
 
 static int
-btc_init(struct secure_area *passphrase,
-         bool                updateAndExit,
-         int                 maxPeers,
-         int                 minPeersInit,
-         char              **errStr)
+bitc_init(struct secure_area *passphrase,
+          bool                updateAndExit,
+          int                 maxPeers,
+          int                 minPeersInit,
+          char              **errStr)
 {
    int res;
 
@@ -966,9 +942,9 @@ btc_init(struct secure_area *passphrase,
 
    bitcui_set_status("starting..");
    util_bumpnofds();
-   btc_log_sslversion();
-   btc_poll_init();
-   btc_req_init();
+   bitc_log_sslversion();
+   bitc_poll_init();
+   bitc_req_init();
    netasync_init(btc->poll);
 
    if (config_getbool(btc->config, FALSE, "network.useSocks5")) {
@@ -1001,7 +977,6 @@ btc_init(struct secure_area *passphrase,
    if (res != 0) {
       return res;
    }
-   btc_filter_init();
 
    bitcui_set_status("adding peers..");
    peergroup_seed();
@@ -1013,28 +988,26 @@ btc_init(struct secure_area *passphrase,
 /*
  *----------------------------------------------------------------
  *
- * btc_exit --
+ * bitc_exit --
  *
  *----------------------------------------------------------------
  */
 
 static void
-btc_exit(void)
+bitc_exit(void)
 {
    Log(LGPFX" %s\n", __FUNCTION__);
    peergroup_exit(btc->peerGroup);
    btc->peerGroup = NULL;
    addrbook_close(btc->book);
    btc->book = NULL;
-   bloom_free(btc->filter);
-   btc->filter = NULL;
    wallet_close(btc->wallet);
    btc->wallet = NULL;
    blockstore_exit(btc->blockStore);
    btc->blockStore = NULL;
-   btc_req_exit();
+   bitc_req_exit();
    netasync_exit();
-   btc_poll_exit();
+   bitc_poll_exit();
    curl_global_cleanup();
 
    config_free(btc->txLabelsCfg);
@@ -1047,14 +1020,14 @@ btc_exit(void)
 /*
  *---------------------------------------------------------------------
  *
- * btc_daemon --
+ * bitc_daemon --
  *
  *---------------------------------------------------------------------
  */
 
 static void
-btc_daemon(bool updateAndExit,
-           int maxPeers)
+bitc_daemon(bool updateAndExit,
+            int maxPeers)
 {
    Warning(LGPFX" daemon running.\n");
    bitcui_set_status("connecting to peers..");
@@ -1119,11 +1092,11 @@ int main(int argc, char *argv[])
       case 'p': getpass = 1;             break;
       case 't': testStr = optarg;        break;
       case 'u': updateAndExit = 1;       break;
-      case 'v': btc_version_and_exit();  break;
+      case 'v': bitc_version_and_exit(); break;
       case 'z': zap = 1;                 break;
       case 'h':
       default:
-         btc_usage();
+         bitc_usage();
          return 0;
       }
    }
@@ -1138,14 +1111,14 @@ int main(int argc, char *argv[])
       free(login);
    }
    util_bumpcoresize();
-   btc_check_config();
+   bitc_check_config();
 
-   res = btc_load_config(&btc->config, configPath);
+   res = bitc_load_config(&btc->config, configPath);
    if (res != 0) {
       return res;
    }
-   btc_load_misc_config();
-   if (btc_check_wallet()) {
+   bitc_load_misc_config();
+   if (bitc_check_wallet()) {
       return 0;
    }
 
@@ -1235,16 +1208,16 @@ int main(int argc, char *argv[])
       goto exit;
    }
 
-   res = btc_init(passphrase, updateAndExit, maxPeers, minPeersInit, &errStr);
+   res = bitc_init(passphrase, updateAndExit, maxPeers, minPeersInit, &errStr);
    if (res) {
       goto exit;
    }
 
-   btc_daemon(updateAndExit, maxPeers);
+   bitc_daemon(updateAndExit, maxPeers);
 
 exit:
-   btc_process_events();
-   btc_exit();
+   bitc_process_events();
+   bitc_exit();
    bitcui_stop();
    poolworker_wait(btc->pw);
    ipinfo_exit();
@@ -1254,7 +1227,7 @@ exit:
    if (errStr) {
       printf("%s\n", errStr);
    } else {
-      btc_bye();
+      bitc_bye();
    }
 
    memset(btc, 0, sizeof *btc);

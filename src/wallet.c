@@ -49,6 +49,7 @@ struct wallet {
    struct secure_area     *pass;
    struct crypt_key       *ckey;
    struct secure_area     *ckey_store;
+   struct bloom_filter    *filter;
 };
 
 
@@ -654,11 +655,29 @@ wallet_update_filter_cb(const void *key,
  *------------------------------------------------------------------------
  */
 
-void
+static void
 wallet_update_filter(const struct wallet *wallet,
                      struct bloom_filter *filter)
 {
    hashtable_for_each(wallet->hash_keys, wallet_update_filter_cb, filter);
+}
+
+
+/*
+ *----------------------------------------------------------------
+ *
+ * wallet_filter_init --
+ *
+ *----------------------------------------------------------------
+ */
+
+static void
+wallet_filter_init(struct wallet *wallet)
+{
+   ASSERT(wallet->filter == NULL);
+   wallet->filter = bloom_create(10, 0.001);
+
+   wallet_update_filter(wallet, wallet->filter);
 }
 
 
@@ -861,6 +880,7 @@ wallet_open(struct config      *config,
 
    wallet->balance = txdb_get_balance(wallet->txdb);
    wallet_print(wallet);
+   wallet_filter_init(wallet);
 
    if (btcui->inuse) {
       struct bitcui_addr *addrs;
@@ -878,6 +898,25 @@ exit:
    *walletOut = NULL;
 
    return res;
+}
+
+
+/*
+ *------------------------------------------------------------------------
+ *
+ * wallet_get_bloom_filter_info --
+ *
+ *------------------------------------------------------------------------
+ */
+
+void
+wallet_get_bloom_filter_info(const struct wallet *wallet,
+                             uint8              **filter,
+                             uint32              *filterSize,
+                             uint32              *numHashFuncs,
+                             uint32              *tweak)
+{
+   bloom_getinfo(wallet->filter, filter, filterSize, numHashFuncs, tweak);
 }
 
 
@@ -1108,6 +1147,8 @@ wallet_close(struct wallet *wallet)
    if (wallet == NULL) {
       return;
    }
+   bloom_free(wallet->filter);
+   wallet->filter = NULL;
    txdb_close(wallet->txdb);
    hashtable_clear_with_callback(wallet->hash_keys, wallet_free_key_cb);
    hashtable_destroy(wallet->hash_keys);
