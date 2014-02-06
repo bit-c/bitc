@@ -5,7 +5,7 @@
 
 #include "block-store.h"
 #include "hash.h"
-
+#include "config.h"
 #include "file.h"
 #include "util.h"
 #include "hashtable.h"

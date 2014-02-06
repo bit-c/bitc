@@ -3,12 +3,11 @@
 
 #include <time.h>
 
-#include "config.h"
 #include "hash.h"
 #include "btc-message.h"
 
 struct blockstore;
-
+struct config;
 
 int  blockstore_init(struct config *, struct blockstore **bs);
 void blockstore_exit(struct blockstore *bs);
@@ -30,10 +29,6 @@ bool blockstore_is_next(struct blockstore *bs, const uint256 *p, const uint256 *
 time_t blockstore_get_timestamp(const struct blockstore *bs);
 time_t blockstore_get_block_timestamp(const struct blockstore *bs,
                                       const uint256 *h);
-void blockstore_get_lowest(struct blockstore *bs,
-                           const uint256 *hash0,
-                           const uint256 *hash1,
-                           uint256 *hash);
 void blockstore_get_highest(struct blockstore *bs,
                             const uint256 *hash0,
                             const uint256 *hash1,
