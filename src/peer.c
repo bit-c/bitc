@@ -715,6 +715,21 @@ peer_handle_merkleblock(struct peer *peer)
    if (res == 0) {
       memcpy(&peer->last_merkle_block, &blk->blkHash, sizeof blk->blkHash);
    }
+
+   /*
+    * If for some reasons we received a block and we don't know its parent, we
+    * need to ask the peer for all of this block's parents we don't know about.
+    */
+   if (!blockstore_is_block_known(btc->blockStore, &blk->header.prevBlock)) {
+      char hashStr0[80];
+      char hashStr1[80];
+      uint256_snprintf_reverse(hashStr1, sizeof hashStr1, &blk->header.prevBlock);
+      uint256_snprintf_reverse(hashStr0, sizeof hashStr0, &blk->blkHash);
+      NOT_TESTED();
+      Log(LGPFX" %s: got %s parent unknown %s\n",
+          peer->name, hashStr0, hashStr1);
+      peer_send_getblocks(peer);
+   }
    btc_msg_merkleblock_free(blk);
    return res;
 }

@@ -1051,7 +1051,7 @@ blockstore_get_locator_hashes(const struct blockstore *bs,
       int i;
 
       ASSERT(n < ARRAYSIZE(h));
-      hash256_calc((void*)&be->header, sizeof be->header, h + n);
+      hash256_calc((void *)&be->header, sizeof be->header, h + n);
       n++;
       if (n >= 10) {
          step *= 2;
