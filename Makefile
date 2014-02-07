@@ -87,6 +87,7 @@ BTC_FILES += main.c
 BTC_FILES += cJSON.c
 BTC_FILES += ip_info.c
 BTC_FILES += crypt.c
+BTC_FILES += rpc.c
 
 BTC_SRC  := $(patsubst %,$(SRCDIR)/%,$(BTC_FILES))
 BTC_SRC  := $(sort $(BTC_SRC))

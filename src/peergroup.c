@@ -512,7 +512,8 @@ peergroup_download_filtered_blocks(struct peer *peer)
       mtime_t lat = time_get() - btc->peerGroup->firstConnectTS;
       char *s = print_latency(lat);
       Warning(LGPFX" %d header%s downloaded in %s\n",
-              btc->peerGroup->numHdrToFetch, btc->peerGroup->numHdrToFetch > 1 ? "s" : "", s);
+              btc->peerGroup->numHdrToFetch,
+              btc->peerGroup->numHdrToFetch > 1 ? "s" : "", s);
       free(s);
    }
    Log(LGPFX" %s -- BITC_STATE_UPDATE_TXDB.\n", __FUNCTION__);
@@ -528,7 +529,7 @@ peergroup_download_filtered_blocks(struct peer *peer)
    peergroup_get_lastblk(btc->peerGroup, &lastHashStore);
 
    /*
-    * Get the oldest/newest of the two.
+    * Get the youngest of the two.
     */
    blockstore_get_highest(bs, &walletHash, &lastHashStore, &startHash);
 
@@ -543,7 +544,8 @@ peergroup_download_filtered_blocks(struct peer *peer)
    }
 
    Log(LGPFX" downloading %d filtered block%s..\n",
-       btc->peerGroup->numToFetch, btc->peerGroup->numToFetch > 1 ? "s" : "");
+       btc->peerGroup->numToFetch,
+       btc->peerGroup->numToFetch > 1 ? "s" : "");
    blockstore_get_next_hashes(bs, &startHash, &nextHash, &n);
 
    peergroup_download_progress();
