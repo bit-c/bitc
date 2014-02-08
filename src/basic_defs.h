@@ -1,7 +1,7 @@
 #ifndef __BASIC_DEFS_H__
 
 #ifdef linux
-#include <stdio.h> // size_t
+#include <stdio.h>
 #else
 #include <stddef.h>
 #endif

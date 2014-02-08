@@ -104,5 +104,5 @@
 
 * sign binaries,
 * package as a .deb for debian/ubuntu,
-* test on diverse platform: arm, big-endian ones, etc.
-* translation.
+* test on diverse platforms: arm, big-endian ones, etc.
+* internationalization.

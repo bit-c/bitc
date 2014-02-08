@@ -188,7 +188,7 @@ bitc_encrypt_wallet(struct secure_area *pass_old,
       return 1;
    }
 
-   printf("Encrypting wallet with passphrase..\n");
+   printf("Encrypting wallet with passphrase.\n");
    res = blockstore_init(btc->config, &btc->blockStore);
    ASSERT(res == 0);
    res = wallet_open(btc->config, pass_old, &errStr, &btc->wallet);
@@ -197,6 +197,8 @@ bitc_encrypt_wallet(struct secure_area *pass_old,
    res = wallet_encrypt(btc->wallet, pass_new);
    if (res) {
       Warning("Failed to encrypt wallet.\n");
+   } else {
+      printf("Done.\n");
    }
 
    wallet_close(btc->wallet);
@@ -1156,13 +1158,14 @@ int main(int argc, char *argv[])
 
    if (encrypt) {
       struct secure_area *pass_old = NULL;
-      struct secure_area *pass_new = NULL;
+      struct secure_area *pass_new0 = NULL;
+      struct secure_area *pass_new1 = NULL;
       bool ok;
       bool s;
 
-      printf("Wallet is about to be encrypted.\n");
       if (btc->wallet_state == WALLET_ENCRYPTED_LOCKED) {
-         printf("   Old password: ");
+         printf("Wallet already encrypted, password update.\n");
+         printf("Type current password: ");
          pass_old = bitc_get_password();
          printf("\n");
          s = wallet_verify(pass_old, &btc->wallet_state);
@@ -1172,14 +1175,24 @@ int main(int argc, char *argv[])
             secure_free(pass_old);
             return 0;
          }
+      } else {
+         printf("Wallet is about to be encrypted.\n");
       }
 
-      printf("   New password: ");
-      pass_new = bitc_get_password();
+      printf("Type new password: ");
+      pass_new0 = bitc_get_password();
+      printf("\nConfirm password: ");
+      pass_new1 = bitc_get_password();
       printf("\n");
-      bitc_encrypt_wallet(pass_old, pass_new);
+      if (pass_new0->len != pass_new1->len ||
+          memcmp(pass_new0->buf, pass_new1->buf, pass_new0->len) != 0) {
+         printf("Passwords differ. Aborting.\n");
+         exit(1);
+      }
+      bitc_encrypt_wallet(pass_old, pass_new0);
       secure_free(pass_old);
-      secure_free(pass_new);
+      secure_free(pass_new1);
+      secure_free(pass_new0);
       return 0;
    }
 

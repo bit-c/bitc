@@ -9,7 +9,7 @@ ASAN = 0
 ###
 
 CFLAGS  = -O1 -MMD -g
-CFLAGS += -Wall -Werror -Wshadow -pedantic
+CFLAGS += -Wall -Werror -Wshadow
 CFLAGS += -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers
 
 CFLAGS += -fno-omit-frame-pointer
