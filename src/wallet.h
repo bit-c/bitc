@@ -33,6 +33,7 @@ int  wallet_handle_tx(struct wallet *wlt, const uint256 *blkHash,
 
 uint64 wallet_get_birth(const struct wallet *wallet);
 bool wallet_is_pubkey_hash160_mine(const struct wallet *wallet, const uint160 *pub_key);
+bool wallet_is_pubkey_spendable(const struct wallet *wallet, const uint160 *pub_key);
 int  wallet_craft_tx(struct wallet *wlt, const struct btc_tx_desc *tx_desc, btc_msg_tx *tx);
 void wallet_confirm_tx_in_block(struct wallet *wallet, const btc_msg_merkleblock *blk);
 struct key * wallet_lookup_pubkey(const struct wallet *wallet, const uint160 *pub_key);

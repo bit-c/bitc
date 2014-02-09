@@ -137,6 +137,17 @@ Tor proxy is not running locally, you need to modify the config options:
 .. in the file  `~/.bitc/main.cfg`. The default `hostname:port` is
 `localhost:9050` on linux, and `localhost:9150` on mac.
 
+---
+
+#### Watch-only Addresses
+
+If you tag a key as
+```
+   key0.spendable = "FALSE"
+```
+in your `~/.bitc/wallet.cfg`, bitc won't attempt to spend the bitcoins held by
+this address. This is not quite like a watch-only address, but we'll get there
+eventually.
 
 ---
 

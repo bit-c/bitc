@@ -73,6 +73,7 @@ struct txo_entry {
    int          outIdx;
    uint64       value;
    bool         spent;
+   bool         spendable;
 };
 
 
@@ -604,10 +605,11 @@ txdb_process_tx_entry(struct txdb      *txdb,
       memcpy(key + 32, &i, sizeof(uint32));
 
       txo_entry = safe_malloc(sizeof *txo_entry);
-      txo_entry->spent    = 0;
-      txo_entry->value    = txo->value;
-      txo_entry->btc_addr = b58_pubkey_from_uint160(&pub_key);
-      txo_entry->outIdx   = i;
+      txo_entry->spent     = 0;
+      txo_entry->value     = txo->value;
+      txo_entry->btc_addr  = b58_pubkey_from_uint160(&pub_key);
+      txo_entry->outIdx    = i;
+      txo_entry->spendable = wallet_is_pubkey_spendable(btc->wallet, &pub_key);
       memcpy(&txo_entry->txHash, txHash,  sizeof *txHash);
       if (blkHash) {
          memcpy(&txo_entry->blkHash, blkHash, sizeof *blkHash);
@@ -1409,7 +1411,8 @@ txdb_select_coins(struct txdb              *txdb,
       struct txo_entry *txo_ent = &txo_array[i++];
       char hashStr[80];
 
-      if (txo_ent->spent == 1) {
+      if (txo_ent->spent == 1 ||
+          txo_ent->spendable == 0) {
          continue;
       }
       if (uint256_iszero(&txo_ent->blkHash)) {
