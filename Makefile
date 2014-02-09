@@ -47,7 +47,7 @@ endif
 ###
 
 LIBS  = -lpthread -lssl -lcrypto -lm -lncurses -lpanel -lform -lcurl
-LIBS += -lleveldb -lsnappy -lstdc++
+LIBS += -lleveldb -lstdc++
 
 ifeq ($(OS), OpenBSD)
 LIBS += -L/usr/local/lib -lexecinfo
