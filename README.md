@@ -2,7 +2,7 @@
 
 bitc is a *thin* SPV bitcoin client.
 * 100% C code,
-* support for linux and mac platforms,
+* support for linux, mac, OpenBSD platforms,
 * console based: uses ncurses,
 * home grown async network i/o stack,
 * home grown poll loop,
@@ -43,7 +43,7 @@ You first need to install the libraries this app uses:
 ```
    # sudo apt-get install git make clang libssl-dev
    # sudo apt-get install libcurl4-openssl-dev libncurses5-dev
-   # sudo apt-get install libleveldb-dev libsnappy-dev
+   # sudo apt-get install libleveldb-dev
    # sudo apt-get install libstdc++-4.8-dev
 ```
 

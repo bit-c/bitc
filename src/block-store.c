@@ -921,14 +921,11 @@ blockstore_get_hash_from_birth(const struct blockstore *bs,
    for (e = bs->best_chain; e != bs->genesis; e = e->prev)  {
       if (e->header.timestamp < birth) {
          char hashStr[80];
+         uint64 ts = birth;
 
          hash256_calc(&e->header, sizeof e->header, hash);
          uint256_snprintf_reverse(hashStr, sizeof hashStr, hash);
-#ifdef __OpenBSD__
-         Log(LGPFX" birth %lld --> block %s.\n", birth, hashStr);
-#else
-         Log(LGPFX" birth %lu --> block %s.\n", birth, hashStr);
-#endif
+         Log(LGPFX" birth %llu --> block %s.\n", ts, hashStr);
          return;
       }
    }
