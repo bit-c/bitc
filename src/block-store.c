@@ -924,7 +924,11 @@ blockstore_get_hash_from_birth(const struct blockstore *bs,
 
          hash256_calc(&e->header, sizeof e->header, hash);
          uint256_snprintf_reverse(hashStr, sizeof hashStr, hash);
+#ifdef __OpenBSD__
+         Log(LGPFX" birth %lld --> block %s.\n", birth, hashStr);
+#else
          Log(LGPFX" birth %lu --> block %s.\n", birth, hashStr);
+#endif
          return;
       }
    }

@@ -6,6 +6,10 @@
 #include <stddef.h>
 #endif
 
+#ifdef __OpenBSD__
+#include <sys/param.h>
+#endif
+
 #define __BASIC_DEFS_H__
 
 typedef unsigned long long uint64;
@@ -38,8 +42,11 @@ typedef uint32 uintptr_t;
 #define ROUNDUP(_a, _b)  (((_a) + (_b) - 1) / (_b) * (_b))
 #define CEILING(_a, _b)  (((_a) + (_b) - 1) / (_b))
 #define ARRAYSIZE(array) (sizeof(array) / sizeof((array)[0]))
+
+#ifndef __OpenBSD__
 #define MAX(_a, _b)      ((_a) > (_b) ? (_a) : (_b))
 #define MIN(_a, _b)      ((_a) < (_b) ? (_a) : (_b))
+#endif
 
 #define DWORD(hi, lo)   ((((uint32)(hi)) << 16) | ((uint16)(lo)))
 #define QWORD(hi, lo)   ((((uint64)(hi)) << 32) | ((uint32)(lo)))
