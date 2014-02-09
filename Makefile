@@ -44,7 +44,7 @@ endif
 ###
 
 LIBS   = -lpthread -lssl -lcrypto -lm -lncurses -lpanel -lform -lcurl
-LIBS  += -lleveldb -lsnappy -lstdc++
+LIBS  += -lleveldb -lstdc++
 VGRND  = valgrind --log-file=/tmp/valgrind.log --leak-check=full --error-exitcode=255
 SRCDIR = src
 BLDDIR = bld
