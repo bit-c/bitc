@@ -26,11 +26,11 @@ bitc is a *thin* SPV bitcoin client.
 
  - cJSON: a C library to parse JSON objects. It's released under MIT license.
         http://sourceforge.net/projects/cjson/
- - libcurl: an http library. It's released under a MIT/X derivate license.
+ - libcurl: an http library. It's released under a MIT/X derivate license.  
 	http://curl.haxx.se/libcurl/
- - LevelDB: Google's key value store, released under the BSD 3-Clause License.
+ - LevelDB: Google's key value store, released under the BSD 3-Clause License.  
 	https://code.google.com/p/leveldb/
- - openSSL: crypto library.
+ - openSSL: crypto library.  
         https://www.openssl.org/
 
 ---
