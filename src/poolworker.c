@@ -120,7 +120,6 @@ poolworker_main(void *clientData)
 
    id = atomic_read(&pw->numRunning);
    LOG(1, (LGPFX" thread %u started.\n", id));
-   pthread_mutex_unlock(&pw->lock);
 
    while (1) {
       struct poolworker_job *job;
@@ -186,7 +185,6 @@ poolworker_create(int numThreads)
    for (i = 0; i < numThreads; i++) {
       pthread_mutex_lock(&pw->lock);
       pthread_create(&pw->p[i].tid, NULL, poolworker_main, pw);
-      pthread_mutex_lock(&pw->lock);
       pthread_mutex_unlock(&pw->lock);
       atomic_inc(&pw->numRunning);
    }
