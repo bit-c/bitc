@@ -37,6 +37,7 @@ struct wallet_key {
    size_t       pubLen;
    uint160      pub_key;
    uint32       cfg_idx;
+   bool         spendable;
 };
 
 
@@ -264,7 +265,8 @@ wallet_alloc_key(struct wallet *wallet,
                  const char    *priv,
                  const char    *pub,
                  const char    *desc,
-                 time_t         birth)
+                 time_t         birth,
+                 bool           spendable)
 {
    struct wallet_key *wkey;
    struct key *key;
@@ -322,12 +324,17 @@ wallet_alloc_key(struct wallet *wallet,
    ASSERT(!uint160_iszero(&pub_key));
 
    wkey = safe_calloc(1, sizeof *wkey);
-   wkey->cfg_idx  = hashtable_getnumentries(wallet->hash_keys);
-   wkey->btc_addr = b58_pubkey_from_uint160(&pub_key);
-   wkey->desc     = desc ? safe_strdup(desc) : NULL;
-   wkey->pub_key  = pub_key;
-   wkey->birth    = birth;
-   wkey->key      = key;
+   wkey->cfg_idx   = hashtable_getnumentries(wallet->hash_keys);
+   wkey->btc_addr  = b58_pubkey_from_uint160(&pub_key);
+   wkey->desc      = desc ? safe_strdup(desc) : NULL;
+   wkey->pub_key   = pub_key;
+   wkey->birth     = birth;
+   wkey->key       = key;
+   wkey->spendable = spendable;
+
+   if (spendable == 0) {
+      Log(LGPFX" funds on %s are not spendable.\n", wkey->btc_addr);
+   }
 
    s = hashtable_insert(wallet->hash_keys, &pub_key, sizeof pub_key, wkey);
    ASSERT(s);
@@ -433,9 +440,10 @@ wallet_save_key_cb(const void *key,
    privStr = b58_bytes_to_privkey(privkey, privlen);
    str_snprintf_bytes(pubStr, sizeof pubStr, NULL, pubkey, publen);
 
-   config_setint64(wcfg, wkey->birth, "key%u.birth",  wkey->cfg_idx);
-   config_setstring(wcfg, wkey->desc, "key%u.desc",   wkey->cfg_idx);
-   config_setstring(wcfg, pubStr,     "key%u.pubkey", wkey->cfg_idx);
+   config_setint64(wcfg, wkey->birth,    "key%u.birth",  wkey->cfg_idx);
+   config_setstring(wcfg, wkey->desc,    "key%u.desc",   wkey->cfg_idx);
+   config_setstring(wcfg, pubStr,        "key%u.pubkey", wkey->cfg_idx);
+   config_setbool(wcfg, wkey->spendable, "key%u.spendable", wkey->cfg_idx);
 
    if (btc->wallet->pass) {
       char *enc = wallet_encrypt_string(btc->wallet, privStr, btc->wallet->ckey);
@@ -601,9 +609,10 @@ wallet_load_keys(struct wallet     *wallet,
       char   *desc = config_getstring(cfg, NULL, "key%u.desc", i);
       char   *priv = config_getstring(cfg, NULL, "key%u.privkey", i);
       char   *pub  = config_getstring(cfg, NULL, "key%u.pubkey", i);
+      bool spendable = config_getbool(cfg, TRUE, "key%u.spendable", i);
       bool s;
 
-      s = wallet_alloc_key(wallet, priv, pub, desc, birth);
+      s = wallet_alloc_key(wallet, priv, pub, desc, birth, spendable);
 
       free(pub);
       free(priv);
@@ -704,6 +713,28 @@ wallet_lookup_pubkey(const struct wallet *wallet,
    }
    ASSERT(wkey->key);
    return wkey->key;
+}
+
+
+/*
+ *------------------------------------------------------------------------
+ *
+ * wallet_is_pubkey_spendable --
+ *
+ *------------------------------------------------------------------------
+ */
+
+bool
+wallet_is_pubkey_spendable(const struct wallet *wallet,
+                           const uint160       *pub_key)
+{
+   struct wallet_key *wkey;
+   bool s;
+
+   s = hashtable_lookup(wallet->hash_keys, pub_key, sizeof *pub_key, (void *)&wkey);
+   ASSERT(s);
+
+   return wkey->spendable;
 }
 
 
@@ -1125,7 +1156,7 @@ wallet_add_key(struct wallet *wallet,
    }
 
    // XXX: fixme
-   wallet_alloc_key(wallet, privStr, NULL, desc, time(NULL));
+   wallet_alloc_key(wallet, privStr, NULL, desc, time(NULL), TRUE);
 
    free(privStr);
 
