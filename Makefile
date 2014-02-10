@@ -20,6 +20,9 @@ CFLAGS += -fsanitize=address
 endif
 endif
 
+ifeq ($(OS), OpenBSD)
+CFLAGS += -I/usr/local/include
+endif
 
 ###
 ### LDOPTS
@@ -43,8 +46,14 @@ endif
 ### the rest
 ###
 
-LIBS   = -lpthread -lssl -lcrypto -lm -lncurses -lpanel -lform -lcurl
-LIBS  += -lleveldb -lstdc++ -lsnappy
+LIBS  = -lpthread -lssl -lcrypto -lm -lncurses -lpanel -lform -lcurl
+LIBS += -lleveldb -lsnappy -lstdc++
+
+ifeq ($(OS), OpenBSD)
+LIBS += -L/usr/local/lib -lexecinfo
+LIBS := $(subst -lsnappy,,$(LIBS))
+endif
+
 VGRND  = valgrind --log-file=/tmp/valgrind.log --leak-check=full --error-exitcode=255
 SRCDIR = src
 BLDDIR = bld

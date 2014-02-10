@@ -21,7 +21,6 @@
 #ifdef linux
 #include <linux/limits.h>
 #else
-#include <uuid/uuid.h>
 #include <sys/syslimits.h>
 #endif
 
