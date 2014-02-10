@@ -43,7 +43,7 @@ typedef uint32 uintptr_t;
 #define CEILING(_a, _b)  (((_a) + (_b) - 1) / (_b))
 #define ARRAYSIZE(array) (sizeof(array) / sizeof((array)[0]))
 
-#ifndef __OpenBSD__
+#ifndef MAX
 #define MAX(_a, _b)      ((_a) > (_b) ? (_a) : (_b))
 #define MIN(_a, _b)      ((_a) < (_b) ? (_a) : (_b))
 #endif
