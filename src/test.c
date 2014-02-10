@@ -14,6 +14,7 @@
 #include "block-store.h"
 #include "crypt.h"
 #include "hashtable.h"
+#include "poolworker.h"
 #include "test.h"
 
 #define LGPFX "TEST:"
@@ -108,6 +109,32 @@ bitc_test_tx(void)
 /*
  *---------------------------------------------------------------------
  *
+ * bitc_pool_test --
+ *
+ *---------------------------------------------------------------------
+ */
+
+static void
+bitc_pool_test(void)
+{
+   struct poolworker_state *pw;
+   int numIterations = 5;
+   int numThreads = 500;
+   int i;
+
+   for (i = 0; i < numIterations; i++) {
+      printf("Creating %u threads.\n", numThreads);
+      pw = poolworker_create(numThreads);
+      printf("Destroying %u threads.\n", numThreads);
+      poolworker_destroy(pw);
+   }
+   printf("Done.\n");
+}
+
+
+/*
+ *---------------------------------------------------------------------
+ *
  * bitc_crypt_test --
  *
  *---------------------------------------------------------------------
@@ -190,6 +217,7 @@ bitc_hashtable_test(void)
 int
 bitc_test(const char *str)
 {
+   bool pool;
    bool crypt;
    bool hash;
    bool tx;
@@ -199,10 +227,12 @@ bitc_test(const char *str)
    hash  = str && strcmp(str, "hash") == 0;
    tx    = str && strcmp(str, "tx") == 0;
    crypt = str && strcmp(str, "crypt") == 0;
+   pool  = str && strcmp(str, "pool") == 0;
 
-   if (crypt == 0 && tx == 0 && hash == 0) {
+   if (crypt == 0 && tx == 0 && hash == 0 && pool == 0) {
       crypt = 1;
       tx = 1;
+      pool = 1;
       hash = 1;
    }
 
@@ -214,6 +244,9 @@ bitc_test(const char *str)
    }
    if (crypt) {
       bitc_crypt_test();
+   }
+   if (pool) {
+      bitc_pool_test();
    }
 
    return 0;
