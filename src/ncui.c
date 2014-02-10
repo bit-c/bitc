@@ -1452,7 +1452,7 @@ ncui_fx_update(void)
    struct ncpanel *panel = ncui_get_panel_by_type(PANEL_FX);
    WINDOW *win = panel->window;
    int off_x = 10;
-   int off_y = 2;
+   int off_y = 3;
    int i;
 
    ASSERT(mutex_islocked(btcui->lock));
@@ -1461,6 +1461,7 @@ ncui_fx_update(void)
 
    wattron(win, PAIR_YELLOW);
    mvwprintw(win, 0, off_x + 1, "source: %s", btcui->fx_provider);
+   mvwprintw(win, 1, off_x + 1, "(updated every %u min)", btcui->fxPeriodMin);
    wattroff(win, PAIR_YELLOW);
 
    for (i = 0; i < btcui->fx_num; i++) {

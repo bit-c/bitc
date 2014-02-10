@@ -97,6 +97,7 @@ struct btcui {
    struct bitcui_fx   *fx_pairs;
    int                fx_num;
    char              *fx_provider;
+   uint32             fxPeriodMin;
 
    /*
     * peer info.

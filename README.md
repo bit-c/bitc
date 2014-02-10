@@ -30,7 +30,7 @@ bitc is a *thin* SPV bitcoin client.
 	http://curl.haxx.se/libcurl/
  - LevelDB: Google's key value store, released under the BSD 3-Clause License.  
 	https://code.google.com/p/leveldb/
- - openSSL: crypto library.  
+ - OpenSSL: crypto library.  
         https://www.openssl.org/
 
 ---
@@ -134,7 +134,7 @@ Tor proxy is not running locally, you need to modify the config options:
  	socks5.hostname="localhost"
 	socks5.port=9050
 ```
-.. in the file  `~/.bitc/main.cfg`. The default `hostname:port` is
+.. in the file `~/.bitc/main.cfg`. The default `hostname:port` is
 `localhost:9050` on linux, and `localhost:9150` on mac.
 
 ---
@@ -165,4 +165,5 @@ on github:
 #### Feedback, comments?
 
 Please feel free to reach out to me if you have any feedback, or if you're
-planning to use this code in interesting ways.
+planning to use this code in interesting ways. Cf [LICENSE file](LICENSE) for
+the contact info.

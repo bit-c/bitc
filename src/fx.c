@@ -10,6 +10,8 @@
 #include "buff.h"
 #include "bitc_ui.h"
 #include "cJSON.h"
+#include "config.h"
+#include "bitc.h"
 
 #define LGPFX "FX:"
 
@@ -402,7 +404,14 @@ fx_init(void)
    fx.fd_wr = -1;
 
    Log(LGPFX" using %s\n", curl_version());
-   poll_callback_time(btcui->poll, 5 * 60 * 1000 * 1000, // 5 min
+
+   /*
+    * Update every 5min by default.
+    */
+   btcui->fxPeriodMin = config_getint64(btc->config, 5, "fx.periodMin");
+   ASSERT(btcui->fxPeriodMin > 0);
+
+   poll_callback_time(btcui->poll, btcui->fxPeriodMin * 60 * 1000 * 1000,
                       1 /* permanent */, fx_periodic_cb, NULL);
 
    fx_do_update();
