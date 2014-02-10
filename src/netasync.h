@@ -2,6 +2,7 @@
 #define __NETASYNC_H__
 
 #include <netinet/in.h>
+#include <sys/socket.h>
 
 #include "basic_defs.h"
 #include "poll.h"

@@ -7,7 +7,6 @@
 #include <errno.h>
 #include <string.h>
 #include <time.h>
-#include <sys/socket.h>
 
 #include "basic_defs.h"
 #include "util.h"
