@@ -14,6 +14,7 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 #include <openssl/crypto.h>
+#include <openssl/ssl.h>
 
 #include "basic_defs.h"
 
@@ -37,6 +38,7 @@
 #include "base58.h"
 #include "ip_info.h"
 #include "crypt.h"
+#include "rpc.h"
 #include "bitc_ui.h"
 
 
@@ -349,16 +351,92 @@ bitc_sigint_handler(int sig)
 /*
  *---------------------------------------------------------------------
  *
- * bitc_log_sslversion --
+ * bitc_openssl_lock_fun --
+ *
+ *---------------------------------------------------------------------
+ */
+
+static pthread_mutex_t *ssl_mutex_array;
+
+static void
+bitc_openssl_lock_fun(int mode,
+                      int n,
+                      const char *file,
+                      int line)
+{
+   pthread_mutex_t *lock = &ssl_mutex_array[n];
+
+   if (mode & CRYPTO_LOCK) {
+      pthread_mutex_lock(lock);
+   } else {
+      pthread_mutex_unlock(lock);
+   }
+}
+
+
+/*
+ *---------------------------------------------------------------------
+ *
+ * bitc_openssl_thread_id_fun --
+ *
+ *---------------------------------------------------------------------
+ */
+
+static unsigned long
+bitc_openssl_thread_id_fun(void)
+{
+   return pthread_self();
+}
+
+
+/*
+ *---------------------------------------------------------------------
+ *
+ * bitc_openssl_init --
  *
  *---------------------------------------------------------------------
  */
 
 static void
-bitc_log_sslversion(void)
+bitc_openssl_init(void)
 {
    const char *sslVersion = SSLeay_version(SSLEAY_VERSION);
-   Log(LGPFX" using %s.\n", sslVersion);
+   int i;
+
+   Log(LGPFX" using %s -- %u locks\n", sslVersion, CRYPTO_num_locks());
+
+   SSL_library_init();
+   ssl_mutex_array = OPENSSL_malloc(CRYPTO_num_locks() *
+                                    sizeof *ssl_mutex_array);
+   ASSERT(ssl_mutex_array);
+
+   for (i = 0; i < CRYPTO_num_locks(); i++ ){
+      pthread_mutex_init(&ssl_mutex_array[i], NULL);
+   }
+   CRYPTO_set_id_callback(bitc_openssl_thread_id_fun);
+   CRYPTO_set_locking_callback(bitc_openssl_lock_fun);
+}
+
+
+/*
+ *------------------------------------------------------------------------
+ *
+ * bitc_openssl_exit --
+ *
+ *------------------------------------------------------------------------
+ */
+
+static void
+bitc_openssl_exit(void)
+{
+   int i;
+
+   CRYPTO_set_id_callback(NULL);
+   CRYPTO_set_locking_callback(NULL);
+   for (i = 0; i < CRYPTO_num_locks(); i++) {
+      pthread_mutex_destroy(&ssl_mutex_array[i]);
+   }
+   OPENSSL_free(ssl_mutex_array);
 }
 
 
@@ -936,7 +1014,6 @@ bitc_init(struct secure_area *passphrase,
 {
    int res;
 
-   curl_global_init(CURL_GLOBAL_DEFAULT);
    Log(LGPFX" %s -- BITC_STATE_STARTING.\n", __FUNCTION__);
    btc->state = BITC_STATE_STARTING;
    btc->wallet_state = WALLET_UNKNOWN;
@@ -944,7 +1021,6 @@ bitc_init(struct secure_area *passphrase,
 
    bitcui_set_status("starting..");
    util_bumpnofds();
-   bitc_log_sslversion();
    bitc_poll_init();
    bitc_req_init();
    netasync_init(btc->poll);
@@ -983,7 +1059,7 @@ bitc_init(struct secure_area *passphrase,
    bitcui_set_status("adding peers..");
    peergroup_seed();
 
-   return res;
+   return rpc_init();
 }
 
 
@@ -999,6 +1075,7 @@ static void
 bitc_exit(void)
 {
    Log(LGPFX" %s\n", __FUNCTION__);
+   rpc_exit();
    peergroup_exit(btc->peerGroup);
    btc->peerGroup = NULL;
    addrbook_close(btc->book);
@@ -1010,7 +1087,6 @@ bitc_exit(void)
    bitc_req_exit();
    netasync_exit();
    bitc_poll_exit();
-   curl_global_cleanup();
 
    config_free(btc->txLabelsCfg);
    config_free(btc->contactsCfg);
@@ -1216,6 +1292,8 @@ int main(int argc, char *argv[])
    btc->lock = mutex_alloc();
    btc->pw = poolworker_create(10);
    ipinfo_init();
+   bitc_openssl_init();
+   curl_global_init(CURL_GLOBAL_DEFAULT);
    res = bitcui_start(withui);
    if (res) {
       goto exit;
@@ -1235,6 +1313,8 @@ exit:
    poolworker_wait(btc->pw);
    ipinfo_exit();
    poolworker_destroy(btc->pw);
+   curl_global_cleanup();
+   bitc_openssl_exit();
    mutex_free(btc->lock);
    secure_free(passphrase);
    if (errStr) {

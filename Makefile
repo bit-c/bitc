@@ -123,7 +123,7 @@ vg-test: bitc inocuoustest
 	$(VGRND) ./bitc -t 0
 
 vg-run:
-	valgrind --log-file=log --leak-check=full --suppressions=./valgrind.supp ./bitc
+	valgrind --log-file=log --leak-check=full --gen-suppressions=all --suppressions=./valgrind.supp ./bitc
 
 ###
 ###  Common

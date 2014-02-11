@@ -49,6 +49,11 @@ int netasync_connect(struct netasync_socket *socket,
                      int timeout_sec,
                      netasync_callback *cb,
                      void *clientData);
+int
+netasync_bind(struct netasync_socket   *sock,
+              const struct sockaddr_in *addr,
+              netasync_callback        *cb,
+              void                     *clientData);
 void
 netasync_use_socks(struct netasync_socket *sock,
                    const char *hostname, short port);

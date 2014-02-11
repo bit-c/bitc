@@ -58,6 +58,8 @@ struct netasync_socket {
    bool                       connect_timeout;
    bool                       connect_async;
 
+   bool                       bind;
+
    bool                       useSocks5;
    char                      *socksHostname;
    uint16                     socksPort;
@@ -326,6 +328,146 @@ netasync_addr2str(const struct sockaddr_in *addr)
    return safe_asprintf("%u.%u.%u.%u",
                         (ip >> 24) & 0xFF, (ip >> 16) & 0xFF,
                         (ip >> 8) & 0xFF, ip & 0xFF);
+}
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * netasync_socket_nonblock --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static int
+netasync_socket_nonblock(const struct netasync_socket *sock)
+{
+   int flags;
+   int res;
+
+   flags = fcntl(sock->fd, F_GETFL, 0);
+   if (flags < 0) {
+      return flags;
+   }
+
+   res = fcntl(sock->fd, F_SETFL, flags | O_NONBLOCK);
+   if (res < 0) {
+      return res;
+   }
+
+   res = 1;
+
+   return setsockopt(sock->fd, SOL_SOCKET, SO_KEEPALIVE, &res, sizeof res);
+}
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * netasync_accept_cb --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static void
+netasync_accept_cb(void *clientData)
+{
+   struct netasync_socket *sock = clientData;
+   struct netasync_socket *client;
+   struct sockaddr addr;
+   socklen_t addrSz;
+   int fd;
+
+   ASSERT(sock->magic == SOCK_MAGIC);
+   ASSERT(sock->bind);
+
+   LOG(1, (LGPFX" %s -- %s: fd=%d err = %d\n",
+           __FUNCTION__, sock->hostname, sock->fd, sock->err));
+
+   addrSz = sizeof addr;
+   fd = accept(sock->fd, &addr, &addrSz);
+   if (fd == -1) {
+      sock->err = errno;
+      return;
+   }
+
+   client = netasync_create();
+   client->fd = fd;
+
+   /*
+    * Once we got a callback because of an async-accept on 'sock', we create
+    * a new socket for the newly accepted fd, then call the accept callback.
+    */
+   sock->connectCb(client, sock->connectCbData, 0);
+}
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * netasync_bind --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+int
+netasync_bind(struct netasync_socket   *sock,
+              const struct sockaddr_in *addr,
+              netasync_callback        *cb,
+              void                     *clientData)
+{
+   int res;
+
+   ASSERT(addr);
+   ASSERT(sock);
+   ASSERT(sock->fd == -1);
+
+   sock->hostname      = netasync_addr2str(addr);
+   sock->connectCb     = cb;
+   sock->connectCbData = clientData;
+   sock->connectTS     = time_get();
+
+   LOG(1, (LGPFX" %s: binding to %s\n", __FUNCTION__, sock->hostname));
+
+   sock->fd = socket(AF_INET, SOCK_STREAM, 0);
+   if (sock->fd < 0) {
+      sock->err = errno;
+      if (sock->err == EMFILE || sock->err == ENFILE) {
+         Warning(LGPFX" Failed to create socket: EMNFILE: no more fd available.\n");
+         Panic("EMNFILE.\n");
+      } else {
+         Log(LGPFX" Failed to create socket: %s (%u)\n",
+             strerror(sock->err), sock->err);
+      }
+      return sock->err;
+   }
+
+   res = bind(sock->fd, (struct sockaddr *)addr, sizeof *addr);
+   if (res == -1) {
+      sock->err = errno;
+      Log(LGPFX" failed to bind: %s (%d)\n", strerror(sock->err), sock->err);
+      return sock->err;
+   }
+
+   res = listen(sock->fd, 100 /* backlog */);
+   if (res == -1) {
+      sock->err = errno;
+      Log(LGPFX" failed to listen: %s (%d)\n", strerror(sock->err), sock->err);
+      return sock->err;
+   }
+
+   sock->err = netasync_socket_nonblock(sock);
+   if (sock->err) {
+      return sock->err;
+   }
+
+   sock->bind = 1;
+   poll_callback_device(netasync.poll, sock->fd,
+                        1, /* read */
+                        0, /* writable */
+                        1, /* permanent */
+                        netasync_accept_cb, sock);
+   return 0;
 }
 
 
@@ -631,36 +773,6 @@ netasync_resolve(const char         *hostname,
 /*
  *-------------------------------------------------------------------------
  *
- * netasync_set_socket_options --
- *
- *-------------------------------------------------------------------------
- */
-
-static int
-netasync_socket_nonblock(const struct netasync_socket *sock)
-{
-   int flags;
-   int res;
-
-   flags = fcntl(sock->fd, F_GETFL, 0);
-   if (flags < 0) {
-      return flags;
-   }
-
-   res = fcntl(sock->fd, F_SETFL, flags | O_NONBLOCK);
-   if (res < 0) {
-      return res;
-   }
-
-   res = 1;
-
-   return setsockopt(sock->fd, SOL_SOCKET, SO_KEEPALIVE, &res, sizeof res);
-}
-
-
-/*
- *-------------------------------------------------------------------------
- *
  * netasync_connect_timeout_cb --
  *
  *-------------------------------------------------------------------------
@@ -735,7 +847,7 @@ netasync_connect(struct netasync_socket   *sock,
    if (sock->fd < 0) {
       sock->err = errno;
       if (sock->err == EMFILE || sock->err == ENFILE) {
-         Warning(LGPFX" Failed to create socket: EMNFILE: not more fd available.\n");
+         Warning(LGPFX" Failed to create socket: EMNFILE: no more fd available.\n");
          Panic("EMNFILE.\n");
       } else {
          Log(LGPFX" Failed to create socket: %s (%u)\n",
@@ -1105,6 +1217,55 @@ netasync_send(struct netasync_socket *sock,
 /*
  *-------------------------------------------------------------------------
  *
+ * netasync_free_send_buf --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static void
+netasync_free_send_buf(struct netasync_socket *sock)
+{
+   struct netasync_send_ctx *ctx = sock->sendCtxList;
+
+   while (ctx) {
+      struct netasync_send_ctx *next = ctx->next;
+
+      free((void*)ctx->buf_orig);
+      memset(ctx, 0xff, sizeof *ctx);
+      free(ctx);
+      ctx = next;
+   }
+}
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
+ * netasync_listen_stop --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+static void
+netasync_listen_stop(struct netasync_socket *sock)
+{
+   bool s;
+
+   ASSERT(sock->bind);
+
+   s = poll_callback_device_remove(netasync.poll, sock->fd,
+                                   1,  /* read */
+                                   0,  /* write */
+                                   1,  /* permanent */
+                                   netasync_accept_cb, sock);
+   ASSERT(s);
+}
+
+
+
+/*
+ *-------------------------------------------------------------------------
+ *
  * netasync_close --
  *
  *-------------------------------------------------------------------------
@@ -1117,27 +1278,16 @@ netasync_close(struct netasync_socket *sock)
 
    if (sock->fd > 0) {
       LOG(1, (LGPFX" closing socket %p: %s @ fd=%d\n",
-              sock, sock->hostname,  sock->fd));
+              sock, sock->hostname, sock->fd));
    } else {
       LOG(1, (LGPFX" destroying socket %p (%s).\n", sock, sock->hostname));
    }
 
-   if (sock == NULL) {
-      return;
+   if (sock->bind) {
+      netasync_listen_stop(sock);
    }
-
    if (sock->sendCtxList) {
-      struct netasync_send_ctx *ctx = sock->sendCtxList;
-
-      while (ctx) {
-         struct netasync_send_ctx *next = ctx->next;
-
-         free((void*)ctx->buf_orig);
-         memset(ctx, 0xff, sizeof *ctx);
-         free(ctx);
-         ctx = next;
-      }
-
+      netasync_free_send_buf(sock);
       netasync_send_stop(sock);
    }
    if (sock->connect_timeout) {

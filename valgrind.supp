@@ -15,3 +15,32 @@
    fun:start_thread
    fun:clone
 }
+{
+   OpenSSLAnnoyingThing
+   Memcheck:Cond
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/lib/x86_64-linux-gnu/libssl.so.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl.so.4.3.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl.so.4.3.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl.so.4.3.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl.so.4.3.0
+   fun:curl_multi_perform
+   fun:curl_easy_perform
+   fun:ipinfo_resolve_geo_cb
+   fun:poolworker_main
+   fun:start_thread
+}
+{
+   CurlThingy
+   Memcheck:Cond
+   obj:/usr/lib/x86_64-linux-gnu/libcurl.so.4.3.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl.so.4.3.0
+   obj:/usr/lib/x86_64-linux-gnu/libcurl.so.4.3.0
+   fun:curl_multi_perform
+   fun:curl_easy_perform
+   fun:ipinfo_resolve_geo_cb
+   fun:poolworker_main
+   fun:start_thread
+   fun:clone
+}
