@@ -385,7 +385,7 @@ bitc_openssl_lock_fun(int mode,
 static unsigned long
 bitc_openssl_thread_id_fun(void)
 {
-   return pthread_self();
+   return (unsigned long)pthread_self();
 }
 
 
