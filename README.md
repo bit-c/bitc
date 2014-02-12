@@ -164,6 +164,8 @@ on github:
 
 #### Feedback, comments?
 
-Please feel free to reach out to me if you have any feedback, or if you're
-planning to use this code in interesting ways. Cf [LICENSE file](LICENSE) for
-the contact info.
+Feel free to reach out to me if you have any feedback or if you're planning to
+use this code in interesting ways.
+
+   mailto:austruym@gmail.com
+   PGP: 1C774FA3925A3076752B2741054E32DFBEE883DB

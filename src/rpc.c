@@ -3,6 +3,8 @@
 
 #include "util.h"
 #include "netasync.h"
+#include "config.h"
+#include "bitc.h"
 #include "rpc.h"
 
 #define LGPFX "RPC:"
@@ -63,6 +65,11 @@ rpc_init(void)
 {
    struct sockaddr_in addr;
    int err;
+
+   if (config_getbool(btc->config, 0, "rpc.enable") == 0) {
+      Log(LGPFX" %s: rpc disabled\n", __FUNCTION__);
+      return 0;
+   }
 
    Log(LGPFX" %s:%u\n", __FUNCTION__, __LINE__);
 
