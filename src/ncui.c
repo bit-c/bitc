@@ -495,6 +495,7 @@ ncui_status_update(bool update)
 {
    struct ncui *ncui = btc->ui;
    WINDOW *win = stdscr;
+   char *type;
 
    ASSERT(mutex_islocked(btcui->lock));
 
@@ -514,6 +515,8 @@ ncui_status_update(bool update)
       wprintw(win, "%s", btcui->statusStr);
       wattroff(win, PAIR_CYAN);
    }
+
+   type = btc->testnet ? "[TESTNET]" : NULL;
 
    char *proxyStr = NULL;
    if (btc->socks5_proxy) {
@@ -537,6 +540,15 @@ ncui_status_update(bool update)
       break;
    default:
       break;
+   }
+
+   if (type) {
+      size_t wlen = wltStr ? strlen(wltStr) : 0;
+      wattron(win, PAIR_MAGENTA);
+      mvwprintw(win, LINES - 2, COLS - strlen(ncui->timeStr) - 3
+                - wlen - (proxyStr ? strlen(proxyStr) : 0) - strlen(type),
+                "%s", type);
+      wattroff(win, PAIR_MAGENTA);
    }
 
    if (proxyStr) {

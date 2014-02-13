@@ -6,6 +6,7 @@
 #include "util.h"
 #include "config.h"
 #include "bitc-defs.h"
+#include "bitc.h"
 #include "hashtable.h"
 #include "file.h"
 
@@ -154,11 +155,11 @@ static char *
 addrbook_get_path(struct config *config)
 {
    char path[PATH_MAX];
-   char *home;
+   char *dir;
 
-   home = util_gethomedir();
-   snprintf(path, sizeof path, "%s/.bitc/peers.dat", home);
-   free(home);
+   dir = bitc_get_directory();
+   snprintf(path, sizeof path, "%s/peers.dat", dir);
+   free(dir);
 
    return config_getstring(config, path, "peers.filename");
 }

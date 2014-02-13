@@ -15,10 +15,24 @@
 
 #define LGPFX "BLCK:"
 
-static const struct {
+
+struct block_cpt_entry_str {
    uint32       height;
    const char  *hashStr;
-} blockCheckpointsData[] = {
+};
+
+
+struct block_cpt_entry {
+   uint32       height;
+   uint256      hash;
+};
+
+
+static const struct block_cpt_entry_str cpt_testnet[] = {
+   {      0, "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943" },
+};
+
+static const struct block_cpt_entry_str cpt_main[] = {
    {      0, "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f" },
    {  11111, "0000000069e244f73d78e8fd29ba2fd2ed618bd6fa2ee92559f542fdb26e7c1d" },
    {  33333, "000000002dd5588a74784eaa7ab0507a18ad16a236e7b1ce69f00d7ddfb5d0a6" },
@@ -34,10 +48,8 @@ static const struct {
    { 275000, "00000000000000044750d80a0d3f3e307e54e8802397ae840d91adc28068f5bc" },
 };
 
-static struct {
-   uint32       height;
-   uint256      hash;
-} blockCheckpoints[ARRAYSIZE(blockCheckpointsData)];
+static struct block_cpt_entry block_cpt_testnet[ARRAYSIZE(cpt_testnet)];
+static struct block_cpt_entry block_cpt_main[ARRAYSIZE(cpt_main)];
 
 struct blockentry {
    struct blockentry   *prev;
@@ -191,11 +203,21 @@ static bool
 blockstore_validate_chkpt(const uint256 *hash,
                           uint32 height)
 {
+   struct block_cpt_entry *array;
+   size_t n;
    int i;
 
-   for (i = 0; i < ARRAYSIZE(blockCheckpoints); i++) {
-      if (height == blockCheckpoints[i].height) {
-         if (!uint256_issame(hash, &blockCheckpoints[i].hash)) {
+   if (btc->testnet) {
+      array = block_cpt_testnet;
+      n = ARRAYSIZE(block_cpt_testnet);
+   } else {
+      array = block_cpt_main;
+      n = ARRAYSIZE(block_cpt_main);
+   }
+
+   for (i = 0; i < n; i++) {
+      if (height == array[i].height) {
+         if (!uint256_issame(hash, &array[i].hash)) {
             char str[128];
             uint256_snprintf_reverse(str, sizeof str, hash);
             Warning(LGPFX" chkpt validation failed. height=%u %s\n",
@@ -765,11 +787,11 @@ static char *
 blockstore_get_filename(struct config *config)
 {
    char bsPath[PATH_MAX];
-   char *home;
+   char *dir;
 
-   home = util_gethomedir();
-   snprintf(bsPath, sizeof bsPath, "%s/.bitc/headers.dat", home);
-   free(home);
+   dir = bitc_get_directory();
+   snprintf(bsPath, sizeof bsPath, "%s/headers.dat", dir);
+   free(dir);
 
    return config_getstring(config, bsPath, "headers.filename");
 }
@@ -841,15 +863,27 @@ blockstore_init(struct config *config,
    bs->hash_blk     = hashtable_create();
    bs->hash_orphans = hashtable_create();
 
-   for (i = 0; i < ARRAYSIZE(blockCheckpointsData); i++) {
-      blockCheckpoints[i].height = blockCheckpointsData[i].height;
-      s = uint256_from_str(blockCheckpointsData[i].hashStr,
-                           &blockCheckpoints[i].hash);
+   const struct block_cpt_entry_str *arrayStr;
+   struct block_cpt_entry *array;
+   int n;
+
+   if (btc->testnet) {
+      n = ARRAYSIZE(cpt_testnet);
+      array = block_cpt_testnet;
+      arrayStr = cpt_testnet;
+   } else {
+      n = ARRAYSIZE(cpt_main);
+      array = block_cpt_main;
+      arrayStr = cpt_main;
+   }
+
+   for (i = 0; i < n; i++) {
+      array[i].height = arrayStr[i].height;
+      s = uint256_from_str(arrayStr[i].hashStr, &array[i].hash);
       ASSERT(s);
    }
-   memcpy(&bs->genesis_hash.data, &blockCheckpoints[0].hash.data,
-          sizeof bs->genesis_hash);
-   Log(LGPFX" Genesis: %s\n", blockCheckpointsData[0].hashStr);
+   memcpy(&bs->genesis_hash.data, &array[0].hash.data, sizeof bs->genesis_hash);
+   Log(LGPFX" Genesis: %s\n", arrayStr[0].hashStr);
 
    res = blockset_open(bs, file);
    free(file);

@@ -11,8 +11,10 @@
 
 #define ONE_BTC                 (100 * 1000 * 1000.0)
 #define BTC_PROTO_VERSION       60001
-#define BTC_NET_MAGIC           0xD9B4BEF9
-#define BTC_PORT                8333
+#define BTC_NET_MAGIC_MAIN      0xD9B4BEF9
+#define BTC_NET_MAGIC_TESTNET   0x0709110B
+#define BTC_PORT_MAIN           8333
+#define BTC_PORT_TESTNET        18333
 
 #define BTC_TX_MAX_SIZE         (128 * 1024)
 

@@ -33,7 +33,6 @@
   is received/initiated.
 * make it easy to import existing keys (i.e. no full rescan needed).
 * make it easy to export existing keys: --export
-* connect to testnet
 * beef-up the regression suite
 * misc synchronization issues: struct config accessed from both ui & main
   threads?

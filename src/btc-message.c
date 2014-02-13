@@ -11,6 +11,7 @@
 #include "serialize.h"
 #include "base58.h"
 #include "buff.h"
+#include "bitc.h"
 
 #include "btc-message.h"
 #include "hash.h"
@@ -272,8 +273,12 @@ btcmsg_addr_is_ipv4(const struct btc_msg_address *addr)
 bool
 btcmsg_header_valid(const btc_msg_header *hdr)
 {
-   if (hdr->magic != BTC_NET_MAGIC) {
-      Log(LGPFX" invalid magic: %#x vs %#x\n", hdr->magic, BTC_NET_MAGIC);
+   uint32 magic;
+
+   magic = btc->testnet ? BTC_NET_MAGIC_TESTNET : BTC_NET_MAGIC_MAIN;
+
+   if (hdr->magic != magic) {
+      Log(LGPFX" invalid magic: %#x vs %#x\n", hdr->magic, magic);
       return 0;
    }
    if (hdr->payloadLength > 256 * 1024) {
@@ -726,7 +731,7 @@ btcmsg_craft_msgheader(struct buff **bufOut,
 
    memset(&h, 0, sizeof h);
 
-   h.magic         = BTC_NET_MAGIC;
+   h.magic = btc->testnet ? BTC_NET_MAGIC_TESTNET : BTC_NET_MAGIC_MAIN;
    h.payloadLength = buff_curlen(bufData);
    strncpy(h.message, message, ARRAYSIZE(h.message));
    hash4_calc(buff_base(bufData), buff_curlen(bufData), h.checksum);

@@ -45,6 +45,7 @@ struct BITCApp {
    struct poolworker_state *pw;
    struct mutex            *lock;
 
+   bool                     testnet;
    volatile int             stop;
    bool                     updateAndExit;
    bool                     notifyInit;
@@ -61,6 +62,7 @@ extern bool bitc_testing;
 
 void bitc_req_stop(void);
 void bitc_req_tx(struct btc_tx_desc *tx_desc);
+char *bitc_get_directory(void);
 
 /*
  *-------------------------------------------------------------------

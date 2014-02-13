@@ -490,11 +490,11 @@ static char *
 txdb_get_db_path(struct config *config)
 {
    char txdbPath[PATH_MAX];
-   char *home;
+   char *dir;
 
-   home = util_gethomedir();
-   snprintf(txdbPath, sizeof txdbPath, "%s/.bitc/txdb", home);
-   free(home);
+   dir = bitc_get_directory();
+   snprintf(txdbPath, sizeof txdbPath, "%s/txdb", dir);
+   free(dir);
 
    return config_getstring(config, txdbPath, "txdb.path");
 }

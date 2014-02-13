@@ -25,12 +25,17 @@ struct tx_broadcast {
 };
 
 
-static const char *peer_seeds[] = {
-   "144.76.28.11",
+static const char *peer_seeds_main[] = {
    "seed.bitcoin.sipa.be",
    "dnsseed.bluematt.me",
    "dnsseed.bitcoin.dashjr.org",
+   "seed.bitcoinstats.com",
    "bitseed.xf2.org",
+};
+
+static const char *peer_seeds_testnet[] = {
+   "testnet-seed.bitcoin.petertodd.org",
+   "testnet-seed.bluematt.me",
 };
 
 static struct {
@@ -919,8 +924,12 @@ peergroup_add_peer_from_str(struct poll_loop *poll,
 void
 peergroup_seed(void)
 {
+   const char **seeds;
+   uint16 port;
    int i;
    int n;
+
+   port = btc->testnet ? BTC_PORT_TESTNET : BTC_PORT_MAIN;
 
    n = config_getint64(btc->config, 0, "numstaticpeers");
    for (i = 0; i < n; i++) {
@@ -929,7 +938,7 @@ peergroup_seed(void)
          break;
       }
       Log(LGPFX" adding static peer '%s'\n", addr);
-      peergroup_add_peer_from_str(btc->poll, addr, BTC_PORT);
+      peergroup_add_peer_from_str(btc->poll, addr, port);
       free(addr);
    }
 
@@ -937,8 +946,16 @@ peergroup_seed(void)
       return;
    }
 
-   for (i = 0; i < ARRAYSIZE(peer_seeds); i++) {
-      peergroup_add_peer_from_str(btc->poll, peer_seeds[i], BTC_PORT);
+   if (btc->testnet) {
+      n = ARRAYSIZE(peer_seeds_testnet);
+      seeds = peer_seeds_testnet;
+   } else {
+      n = ARRAYSIZE(peer_seeds_main);
+      seeds = peer_seeds_main;
+   }
+
+   for (i = 0; i < n; i++) {
+      peergroup_add_peer_from_str(btc->poll, seeds[i], port);
    }
 }
 

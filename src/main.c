@@ -300,7 +300,8 @@ bitc_usage(void)
           " -e, --encrypt                  encrypt the wallet file\n"
           " -n, --numPeers   <maxPeers>    number of peers to connect to, default is 5\n"
           " -p, --passphrase               prompt for passphrase\n"
-          " -t, --test       <param>       test suite: argument is the name of the test.\n"
+          " -t, --test       <param>       test suite: argument is the name of the test\n"
+          " -T, --testnet                  connect to testnet\n"
           " -u, --update                   update block-store and exit\n"
           " -v, --version                  display version string and exit\n"
           " -z, --zap                      zap headers & txdb (wallet is preserved)\n",
@@ -477,6 +478,28 @@ bitc_check_create_file(const char *filename,
 /*
  *------------------------------------------------------------------------
  *
+ * bitc_get_directory --
+ *
+ *------------------------------------------------------------------------
+ */
+
+char *
+bitc_get_directory(void)
+{
+   char *home;
+   char *res;
+
+   home = util_gethomedir();
+   res = safe_asprintf("%s/.bitc%s", home, btc->testnet ? "-testnet" : "");
+   free(home);
+
+   return res;
+}
+
+
+/*
+ *------------------------------------------------------------------------
+ *
  * bitc_check_config --
  *
  *------------------------------------------------------------------------
@@ -485,20 +508,18 @@ bitc_check_create_file(const char *filename,
 static int
 bitc_check_config(void)
 {
-   char *btcDir;
    char *cfgPath;
    char *ctcPath;
    char *txPath;
-   char *home;
+   char *dir;
    int res = 0;
 
-   home = util_gethomedir();
-   btcDir  = safe_asprintf("%s/.bitc/", home);
-   cfgPath = safe_asprintf("%s/.bitc/main.cfg", home);
-   ctcPath = safe_asprintf("%s/.bitc/contacts.cfg", home);
-   txPath  = safe_asprintf("%s/.bitc/tx-labels.cfg", home);
+   dir = bitc_get_directory();
+   cfgPath = safe_asprintf("%s/main.cfg",      dir);
+   ctcPath = safe_asprintf("%s/contacts.cfg",  dir);
+   txPath  = safe_asprintf("%s/tx-labels.cfg", dir);
 
-   if (!file_exists(btcDir) || !file_exists(cfgPath)) {
+   if (!file_exists(dir) || !file_exists(cfgPath)) {
       printf("\nIt looks like you're a new user. Welcome!\n"
              "\n"
              "Note that bitc uses the directory: ~/.bitc to store:\n"
@@ -511,18 +532,18 @@ bitc_check_config(void)
              " - a tx-label file:      ~/.bitc/tx-labels.cfg   --  < 1 KB\n\n");
    }
 
-   if (!file_exists(btcDir)) {
-      Log(LGPFX" creating directory: %s\n", btcDir);
-      res = file_mkdir(btcDir);
+   if (!file_exists(dir)) {
+      Log(LGPFX" creating directory: %s\n", dir);
+      res = file_mkdir(dir);
       if (res) {
          printf("Failed to create directory '%s': %s\n",
-                btcDir, strerror(res));
+                dir, strerror(res));
          goto exit;
       }
-      res = file_chmod(btcDir, 0700);
+      res = file_chmod(dir, 0700);
       if (res) {
          printf("Failed to chmod 0600 directory '%s': %s\n",
-                btcDir, strerror(res));
+                dir, strerror(res));
          goto exit;
       }
    }
@@ -558,8 +579,7 @@ exit:
    free(txPath);
    free(cfgPath);
    free(ctcPath);
-   free(btcDir);
-   free(home);
+   free(dir);
 
    return res;
 }
@@ -623,16 +643,16 @@ static void
 bitc_load_misc_config(void)
 {
    char *defaultPath;
-   char *home;
+   char *dir;
    char *path;
    int res;
 
-   home = util_gethomedir();
+   dir = bitc_get_directory();
 
    /*
     * contacts.
     */
-   defaultPath = safe_asprintf("%s/.bitc/contacts.cfg", home);
+   defaultPath = safe_asprintf("%s/contacts.cfg", dir);
    path = config_getstring(btc->config, defaultPath, "contacts.filename");
    res = config_load(path, &btc->contactsCfg);
    if (res) {
@@ -644,7 +664,7 @@ bitc_load_misc_config(void)
    /*
     * tx-label.
     */
-   defaultPath = safe_asprintf("%s/.bitc/tx-labels.cfg", home);
+   defaultPath = safe_asprintf("%s/tx-labels.cfg", dir);
    path = config_getstring(btc->config, defaultPath, "tx-labels.filename");
    res = config_load(path, &btc->txLabelsCfg);
    if (res) {
@@ -653,7 +673,7 @@ bitc_load_misc_config(void)
    free(defaultPath);
    free(path);
 
-   free(home);
+   free(dir);
 }
 
 
@@ -674,9 +694,9 @@ bitc_load_config(struct config **config,
    int res;
 
    if (configPath == NULL) {
-      char *home = util_gethomedir();
-      defaultPath = safe_asprintf("%s/.bitc/main.cfg", home);
-      free(home);
+      char *dir = bitc_get_directory();
+      defaultPath = safe_asprintf("%s/main.cfg", dir);
+      free(dir);
       path = defaultPath;
    } else {
       path = configPath;
@@ -1152,6 +1172,7 @@ int main(int argc, char *argv[])
       { "numPeers",     required_argument,  0,  'n' },
       { "passphrase",   required_argument,  0,  'p' },
       { "test",         required_argument,  0,  't' },
+      { "testnet",      no_argument,        0,  'T' },
       { "update",       no_argument,        0,  'u' },
       { "version",      no_argument,        0,  'v' },
       { "zap",          no_argument,        0,  'z' },
@@ -1159,7 +1180,7 @@ int main(int argc, char *argv[])
 
    bitc_signal_install();
 
-   while ((c = getopt_long(argc, argv, "a:c:dehn:pt:uvz",
+   while ((c = getopt_long(argc, argv, "a:c:dehn:pt:Tuvz",
                            long_opts, NULL)) != EOF) {
       switch (c) {
       case 'a': addr_label = optarg;     break;
@@ -1169,6 +1190,7 @@ int main(int argc, char *argv[])
       case 'n': maxPeers = atoi(optarg); break;
       case 'p': getpass = 1;             break;
       case 't': testStr = optarg;        break;
+      case 'T': btc->testnet = 1;        break;
       case 'u': updateAndExit = 1;       break;
       case 'v': bitc_version_and_exit(); break;
       case 'z': zap = 1;                 break;
@@ -1177,6 +1199,11 @@ int main(int argc, char *argv[])
          bitc_usage();
          return 0;
       }
+   }
+
+   if (btc->testnet) {
+      printf("Using testnet.\n");
+      usleep(500 * 1000);
    }
 
    Log_SetLevel(1);

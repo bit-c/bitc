@@ -72,11 +72,11 @@ char *
 wallet_get_filename(void)
 {
    char str[256];
-   char *home;
+   char *dir;
 
-   home = util_gethomedir();
-   snprintf(str, sizeof str, "%s/.bitc/wallet.cfg", home);
-   free(home);
+   dir = bitc_get_directory();
+   snprintf(str, sizeof str, "%s/wallet.cfg", dir);
+   free(dir);
 
    return config_getstring(btc->config, str, "wallet.filename");
 }
