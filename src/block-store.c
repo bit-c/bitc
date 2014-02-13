@@ -84,6 +84,33 @@ struct blockstore {
 /*
  *------------------------------------------------------------------------
  *
+ * blockstore_lookup --
+ *
+ *------------------------------------------------------------------------
+ */
+
+static struct blockentry *
+blockstore_lookup(const struct blockstore *bs,
+                  const uint256           *hash)
+{
+   struct blockentry *be;
+   bool s;
+
+   s = hashtable_lookup(bs->hash_orphans, hash, sizeof *hash, (void *)&be);
+   if (s) {
+      return be;
+   }
+   s = hashtable_lookup(bs->hash_blk, hash, sizeof *hash, (void *)&be);
+   if (s) {
+      return be;
+   }
+   return NULL;
+}
+
+
+/*
+ *------------------------------------------------------------------------
+ *
  * blockstore_get_timestamp --
  *
  *------------------------------------------------------------------------
@@ -279,15 +306,7 @@ blockstore_set_chain_links(struct blockstore *bs,
 
    ASSERT(be->height == -1); // orphan
 
-   prev = NULL;
-   s = hashtable_lookup(bs->hash_orphans, &be->header.prevBlock,
-                        sizeof(uint256), (void *)&prev);
-   if (s == 0) {
-      s = hashtable_lookup(bs->hash_blk, &be->header.prevBlock,
-                           sizeof(uint256), (void *)&prev);
-   }
-
-   ASSERT(s);
+   prev = blockstore_lookup(bs, &be->header.prevBlock);
    ASSERT(prev);
 
    be->height = 1 + blockstore_set_chain_links(bs, prev);
@@ -321,7 +340,6 @@ blockstore_find_alternate_chain_height(struct blockstore *bs,
                                        struct blockentry *be)
 {
    struct blockentry *prev;
-   bool s;
 
    if (be->height > 0) {
       return be->height;
@@ -329,17 +347,10 @@ blockstore_find_alternate_chain_height(struct blockstore *bs,
 
    ASSERT(be->height == -1); // orphan
 
-   s = hashtable_lookup(bs->hash_orphans, &be->header.prevBlock,
-                        sizeof(uint256), (void *)&prev);
-   if (s == 0) {
-      s = hashtable_lookup(bs->hash_blk, &be->header.prevBlock,
-                           sizeof(uint256), (void *)&prev);
-   }
-   if (s == 0) {
+   prev = blockstore_lookup(bs, &be->header.prevBlock);
+   if (prev == NULL) {
       return 0;
    }
-
-   ASSERT(prev);
 
    return 1 + blockstore_find_alternate_chain_height(bs, prev);
 }
@@ -589,7 +600,6 @@ blockstore_add_header(struct blockstore      *bs,
 {
    static unsigned int count;
    struct blockentry *be;
-   bool s;
 
    *orphan = 0;
 
@@ -604,13 +614,8 @@ blockstore_add_header(struct blockstore      *bs,
       ASSERT(uint256_issame(hash, &hash0));
    }
 
-   s = hashtable_lookup(bs->hash_blk, hash, sizeof *hash, NULL);
-   if (s) {
-      return 0;
-   }
-
-   s = hashtable_lookup(bs->hash_orphans, hash, sizeof *hash, NULL);
-   if (s) {
+   be = blockstore_lookup(bs, hash);
+   if (be) {
       return 0;
    }
 
@@ -1126,14 +1131,13 @@ blockstore_get_block_timestamp(const struct blockstore *bs,
                                const uint256 *hash)
 {
    struct blockentry *be;
-   bool s;
 
    if (uint256_iszero(hash)) {
       return 0;
    }
 
-   s = hashtable_lookup(bs->hash_blk, hash, sizeof *hash, (void*)&be);
-   if (s == 0) {
+   be = blockstore_lookup(bs, hash);
+   if (be == NULL) {
       char hashStr[80];
 
       uint256_snprintf_reverse(hashStr, sizeof hashStr, hash);
