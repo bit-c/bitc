@@ -1176,6 +1176,7 @@ int main(int argc, char *argv[])
       { "update",       no_argument,        0,  'u' },
       { "version",      no_argument,        0,  'v' },
       { "zap",          no_argument,        0,  'z' },
+      { NULL,           0,                  0,   0  },
    };
 
    bitc_signal_install();
