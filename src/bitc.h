@@ -46,6 +46,7 @@ struct BITCApp {
    struct mutex            *lock;
 
    bool                     testnet;
+   bool                     resolve_peers;
    volatile int             stop;
    bool                     updateAndExit;
    bool                     notifyInit;
@@ -64,16 +65,32 @@ void bitc_req_stop(void);
 void bitc_req_tx(struct btc_tx_desc *tx_desc);
 char *bitc_get_directory(void);
 
+
 /*
  *-------------------------------------------------------------------
  *
- * bitc_ready --
+ * bitc_state_updating_txdb --
  *
  *-------------------------------------------------------------------
  */
 
 static inline bool
-bitc_ready(void)
+bitc_state_updating_txdb(void)
+{
+   return btc->state == BITC_STATE_UPDATE_TXDB;
+}
+
+
+/*
+ *-------------------------------------------------------------------
+ *
+ * bitc_state_ready --
+ *
+ *-------------------------------------------------------------------
+ */
+
+static inline bool
+bitc_state_ready(void)
 {
    return btc->state == BITC_STATE_READY;
 }

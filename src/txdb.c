@@ -1166,7 +1166,7 @@ txdb_remember_tx(struct txdb   *txdb,
    }
 
    txdb_export_tx_info(txdb);
-   if (bitc_ready()) {
+   if (bitc_state_ready()) {
       int64 value = txdb_get_tx_credit(&txe->tx) - txdb_get_tx_debit(&txe->tx);
 
       bitcui_set_status("New payment %s: %.8f BTC",

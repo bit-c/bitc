@@ -21,6 +21,7 @@ enum ConfigKVType {
 
 struct KeyValuePair {
    char                *key;
+   bool                 save;
    struct KeyValuePair *next;
    enum ConfigKVType    type;
    union {
@@ -148,8 +149,8 @@ config_freekvlist(struct KeyValuePair *list)
 
 void
 config_setint64(struct config *config,
-                int64 val,
-                const char *fmt,
+                int64          val,
+                const char    *fmt,
                 ...)
 {
    struct KeyValuePair *e;
@@ -175,6 +176,7 @@ config_setint64(struct config *config,
       e->type = CONFIG_KV_INT64;
       config_insert(config, e);
    }
+   e->save = 1;
    e->u.val = val;
 }
 
@@ -189,8 +191,8 @@ config_setint64(struct config *config,
 
 void
 config_setbool(struct config *config,
-               bool s,
-               const char *fmt,
+               bool           s,
+               const char    *fmt,
                ...)
 {
    struct KeyValuePair *e;
@@ -216,6 +218,7 @@ config_setbool(struct config *config,
       e->type = CONFIG_KV_BOOL;
       config_insert(config, e);
    }
+   e->save = 1;
    e->u.trueOrFalse = s;
 }
 
@@ -230,7 +233,7 @@ config_setbool(struct config *config,
 
 bool
 config_isset(struct config *config,
-             const char *fmt,
+             const char    *fmt,
              ...)
 {
    struct KeyValuePair *e;
@@ -257,8 +260,8 @@ config_isset(struct config *config,
 
 void
 config_setstring(struct config *config,
-                 const char *str,
-                 const char *fmt,
+                 const char    *str,
+                 const char    *fmt,
                  ...)
 {
    struct KeyValuePair *e;
@@ -281,6 +284,7 @@ config_setstring(struct config *config,
       e->type = CONFIG_KV_STRING;
       config_insert(config, e);
    }
+   e->save = 1;
    e->u.str = str ? safe_strdup(str) : NULL;
 }
 
@@ -295,8 +299,8 @@ config_setstring(struct config *config,
 
 static void
 config_setunknownkv(struct config *config,
-                    const char *key,
-                    const char *val)
+                    const char    *key,
+                    const char    *val)
 {
    struct KeyValuePair *e;
 
@@ -304,6 +308,7 @@ config_setunknownkv(struct config *config,
    e->key   = safe_strdup(key);
    e->u.str = safe_strdup(val);
    e->type  = CONFIG_KV_UNKNOWN;
+   e->save  = 1;
 
    config_insert(config, e);
 }
@@ -419,8 +424,8 @@ config_parseline(char *line,
 
 int64
 config_getint64(struct config *config,
-                int64 defaultValue,
-                const char *format,
+                int64          defaultValue,
+                const char    *format,
                 ...)
 {
    struct KeyValuePair *e;
@@ -453,6 +458,8 @@ config_getint64(struct config *config,
       return e->u.val;
    } else {
       config_setint64(config, defaultValue, "%s", key);
+      e = config_get(config, key);
+      e->save = 0;
       return defaultValue;
    }
 }
@@ -468,8 +475,8 @@ config_getint64(struct config *config,
 
 bool
 config_getbool(struct config *config,
-               bool defaultValue,
-               const char *fmt,
+               bool           defaultValue,
+               const char    *fmt,
                ...)
 {
    struct KeyValuePair *e;
@@ -504,6 +511,8 @@ config_getbool(struct config *config,
       return e->u.trueOrFalse;
    } else {
       config_setbool(config, defaultValue, "%s", key);
+      e = config_get(config, key);
+      e->save = 0;
       return defaultValue;
    }
 }
@@ -519,8 +528,8 @@ config_getbool(struct config *config,
 
 char *
 config_getstring(struct config *config,
-                 const char *defaultStr,
-                 const char *format,
+                 const char    *defaultStr,
+                 const char    *format,
                  ...)
 {
    struct KeyValuePair *e;
@@ -545,6 +554,8 @@ config_getstring(struct config *config,
       return e->u.str ? safe_strdup(e->u.str) : NULL;
    } else {
       config_setstring(config, defaultStr, "%s", key);
+      e = config_get(config, key);
+      e->save = 0;
       return defaultStr ? safe_strdup(defaultStr) : NULL;
    }
 }
@@ -672,7 +683,7 @@ config_save(struct config *conf)
 
 int
 config_write(struct config *conf,
-             const char *filename)
+             const char    *filename)
 {
    struct file_descriptor *fd;
    struct KeyValuePair *e;
@@ -708,6 +719,12 @@ config_write(struct config *conf,
    while (e) {
       size_t numBytes;
       char *s = NULL;
+
+      if (e->save == 0) {
+         Log(LGPFX" not writing key '%s'\n", e->key);
+         e = e->next;
+         continue;
+      }
 
       switch (e->type) {
       case CONFIG_KV_INT64:

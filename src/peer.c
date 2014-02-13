@@ -909,7 +909,7 @@ peer_handle_inv(struct peer *peer)
    LOG(1, (LGPFX" %s: handling inv msg: tx=%2d blk=%2d numfblk=%d numHash=%d\n",
            peer->name, numtx, numblk, numfblk, numHash));
 
-   if (bitc_ready()) {
+   if (bitc_state_ready()) {
       for (i = 0; i < numHash; i++) {
          uint256_snprintf_reverse(hashStr, sizeof hashStr, hash + i);
          Log(LGPFX" %s: [%d / %d] requesting %s %s\n",

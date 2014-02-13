@@ -825,7 +825,9 @@ bitcui_set_peer_info(int peers_active,
 
    mutex_unlock(btcui->lock);
 
-   bitcui_async_resolve_peers();
+   if (btc->resolve_peers) {
+      bitcui_async_resolve_peers();
+   }
 
    bitcui_req_notify_info_update();
 }

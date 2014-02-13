@@ -647,6 +647,8 @@ bitc_load_misc_config(void)
    char *path;
    int res;
 
+   btc->resolve_peers = config_getbool(btc->config, 1, "resolve.peers");
+
    dir = bitc_get_directory();
 
    /*

@@ -1108,7 +1108,7 @@ here:
       ncui_redraw();
       break;
    case 20: // CTRL-T
-      if (!bitc_ready()) {
+      if (!bitc_state_ready()) {
          bitcui_set_status("failed to initiate tx: still sync'ing..");
          break;
       }
@@ -2122,7 +2122,7 @@ ncui_dashboard_latest_blocks(WINDOW *win,
    int idx;
    int j;
 
-   if (!bitc_ready() || btcui->numBlocks < 12) {
+   if (!bitc_state_ready() || btcui->numBlocks < 12) {
       return y;
    }
 
@@ -2191,7 +2191,7 @@ ncui_dashboard_peers(WINDOW *win,
    int j;
 
    ASSERT(mutex_islocked(btcui->lock));
-   if (!bitc_ready() || btcui->peer_num == 0) {
+   if (!bitc_state_ready() || btcui->peer_num == 0) {
       return y;
    }
 
@@ -2269,7 +2269,7 @@ ncui_dashboard_latest_tx(WINDOW *win,
    int n = 0;
    int j;
 
-   if (!bitc_ready()) {
+   if (!bitc_state_ready()) {
       return y;
    }
 
@@ -2341,7 +2341,7 @@ ncui_dashboard_balance(WINDOW *win,
    int64 unconf;
    int64 conf;
 
-   if (!bitc_ready()) {
+   if (!bitc_state_ready()) {
       return y;
    }
 
@@ -2448,7 +2448,7 @@ static int
 ncui_dashboard_sync_info(WINDOW *win,
                          int y)
 {
-   if (bitc_ready()) {
+   if (bitc_state_ready()) {
       return y;
    }
 

@@ -375,12 +375,10 @@ peergroup_add_block_finalize(struct blockstore *bs,
    if (headerOnly == 0) {
       peergroup_set_lastblk(btc->peerGroup, &best_hash);
    }
-   if (bitc_ready() || (blockstore_get_height(bs) % 2000) == 0) {
+   if (bitc_state_ready() || bitc_state_updating_txdb() ||
+       (blockstore_get_height(bs) % 2000) == 0) {
       bitcui_set_last_block_info(&best_hash, blockstore_get_height(bs),
                                  blockstore_get_timestamp(btc->blockStore));
-   }
-   if (bitc_ready()) {
-      wallet_export_tx_info(btc->wallet);
    }
 }
 
@@ -1280,9 +1278,9 @@ peergroup_new_tx_broadcast(struct peergroup  *pg,
  */
 
 void
-peergroup_handle_addr(struct peer     *peer,
+peergroup_handle_addr(struct peer      *peer,
                       btc_msg_address **addrs,
-                      size_t           numAddrs)
+                      size_t            numAddrs)
 {
    bool update = 0;
    size_t i;
@@ -1325,7 +1323,6 @@ peergroup_handle_merkleblock(struct peer *peer,
           btc->state == BITC_STATE_UPDATE_TXDB);
 
    peergroup_process_filtered_block(peer, blk);
-
    wallet_confirm_tx_in_block(btc->wallet, blk);
 
    if (btc->state == BITC_STATE_READY) {
@@ -1333,7 +1330,6 @@ peergroup_handle_merkleblock(struct peer *peer,
    }
 
    ASSERT(btc->state == BITC_STATE_UPDATE_TXDB);
-
 
    return peergroup_download_filtered_blocks_continue(peer);
 }
