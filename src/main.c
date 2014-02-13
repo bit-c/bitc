@@ -1210,7 +1210,9 @@ int main(int argc, char *argv[])
    {
       char *login = util_getusername();
       char *logFile;
-      logFile = safe_asprintf("/tmp/bitc-%s.log", login ? login : "foo");
+      logFile = safe_asprintf("/tmp/bitc-%s%s.log",
+                              login ? login : "foo",
+                              btc->testnet ? "-testnet" : "");
       Log_Init(logFile);
       free(logFile);
       free(login);
