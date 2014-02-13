@@ -568,11 +568,6 @@ blockstore_write_headers(struct blockstore *bs)
       Warning(LGPFX" failed to write %u block entries.\n", numhdr);
       return;
    }
-   res = file_sync(bs->blockSet->desc);
-   if (res != 0) {
-      Warning(LGPFX" failed to fsync block file.\n");
-      return;
-   }
 
    bs->blockSet->filesize += numWritten;
 }
