@@ -24,7 +24,7 @@ struct poll_entry {
    void                *callbackData;
    bool                 permanent;
    bool                 queued;
-   int8                 refCount;
+   int                  refCount;
    enum poll_type       type;
    union {
       struct {
