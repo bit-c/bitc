@@ -1588,7 +1588,6 @@ txdb_export_tx_cb(const void *key,
    struct bitcui_tx **txiPtr = (struct bitcui_tx **)cbData;
    struct tx_entry *txe = (struct tx_entry *)keyData;
    struct bitcui_tx *txi = *txiPtr;
-   uint32 height;
    char hashStr[80];
 
    if (txe->relevant == 0) {
@@ -1609,7 +1608,6 @@ txdb_export_tx_cb(const void *key,
    txi->value  = txdb_get_tx_credit(&txe->tx);
    txi->value -= txdb_get_tx_debit(&txe->tx);
 
-   height = blockstore_get_height(btc->blockStore);
    txi->blockHeight = -1;
    if (!uint256_iszero(&txe->blkHash)) {
       txi->blockHeight = blockstore_get_block_height(btc->blockStore,
