@@ -224,10 +224,10 @@ ncui_get_max_tx_amount(void)
    for (i = 0; i < btcui->tx_num; i++) {
       int64 txValue = tx_info[i].value;
 
-      if (tx_info[i].numConfirmations > 0) {
+      if (tx_info[i].blockHeight != -1) {
          conf += txValue;
       } else if (txValue < 0) {
-         ASSERT(tx_info[i].numConfirmations == 0);
+         ASSERT(tx_info[i].blockHeight == -1);
 
          pendingDebit += txValue;
       }
@@ -257,7 +257,10 @@ ncui_get_balance(int64 *confirmed,
    int i;
 
    for (i = 0; i < btcui->tx_num; i++) {
-      if (tx_info[i].numConfirmations >= 6) { // ~ 1h
+      /*
+       * tx that have less than 6 confirmations are deemed unconfirmed.
+       */
+      if ((btcui->height - tx_info[i].blockHeight + 1) >= 6) { // ~ 1h
          conf += tx_info[i].value;
       } else {
          pending += tx_info[i].value;
@@ -1392,7 +1395,6 @@ ncui_tx_update(void)
       size_t pendingLen = 0;
       size_t tslen;
       int y;
-      int conf;
       char *ts;
 
       y = btcui->tx_num - 1 - i;
@@ -1430,13 +1432,15 @@ ncui_tx_update(void)
       mvwaddch(win,  y, 7 + tslen + 28, ACS_VLINE);
 
       wattron(win, PAIR_MAGENTA);
-      conf =  tx_info[i].numConfirmations;
-      if (conf == 0) {
+      if (tx_info[i].blockHeight == -1) {
          mvwprintw(win, y, 7 + tslen + 30, "** pending **");
          pendingLen = 14;
-      } else if (conf < 6) {
-         mvwprintw(win, y, 7 + tslen + 30, "** %d conf **", conf);
-         pendingLen = 14;
+      } else {
+         uint32 conf = btcui->height - tx_info[i].blockHeight + 1;
+         if (conf < 6) {
+            mvwprintw(win, y, 7 + tslen + 30, "** %d conf **", conf);
+            pendingLen = 14;
+         }
       }
       wattroff(win, PAIR_MAGENTA);
 
@@ -2302,13 +2306,13 @@ ncui_dashboard_latest_tx(WINDOW *win,
          wattroff(win, PAIR_MAGENTA);
       }
       mvwaddch(win,  y, 5 + tslen + 13, ACS_VLINE);
-      if (tx_info[j].numConfirmations == 0) {
+      if (tx_info[j].blockHeight == -1) {
          wattron(win, PAIR_MAGENTA);
          mvwprintw(win, y, 5 + tslen + 15, "** pending **");
          wattroff(win, PAIR_MAGENTA);
       } else {
-         mvwprintw(win, y, 5 + tslen + 15, "%3u conf.",
-                   tx_info[j].numConfirmations);
+         uint32 numConf = btcui->height - tx_info[j].blockHeight + 1;
+         mvwprintw(win, y, 5 + tslen + 15, "%3u conf.", numConf);
       }
       y++;
       n++;

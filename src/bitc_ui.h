@@ -23,7 +23,6 @@ struct bitcui_tx {
    char        *src;
    char        *dst;
    int64        value;
-   uint32       numConfirmations;
    uint32       blockHeight;
    time_t       timestamp;
    char        *desc;

@@ -1610,13 +1610,10 @@ txdb_export_tx_cb(const void *key,
    txi->value -= txdb_get_tx_debit(&txe->tx);
 
    height = blockstore_get_height(btc->blockStore);
-   txi->numConfirmations = 0;
+   txi->blockHeight = -1;
    if (!uint256_iszero(&txe->blkHash)) {
       txi->blockHeight = blockstore_get_block_height(btc->blockStore,
                                                      &txe->blkHash);
-      txi->numConfirmations = height - txi->blockHeight + 1;
-   } else {
-      txi->blockHeight = height + 1; // not correct: just for ordering.
    }
 
    uint256_snprintf_reverse(hashStr, sizeof hashStr, (uint256*)key);
