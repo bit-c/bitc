@@ -16,9 +16,9 @@ ASAN = 0
 CFLAGS  = -O1 -MMD -g
 CFLAGS += -Wall -Werror
 ifneq ($(ARCH), armv6l)
-CFLAGS += -Wshadow
+CFLAGS += -Wshadow -Wextra
 endif
-CFLAGS += -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers
+CFLAGS += -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers
 
 CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -fstack-protector
