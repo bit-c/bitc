@@ -1161,7 +1161,7 @@ int main(int argc, char *argv[])
    bool zap = 0;
    bool withui = 1;
    bool encrypt = 0;
-   bool getpass = 0;
+   bool getpassword = 0;
    int res = 0;
    int c;
 
@@ -1191,7 +1191,7 @@ int main(int argc, char *argv[])
       case 'd': withui = 0;              break;
       case 'e': encrypt = 1;             break;
       case 'n': maxPeers = atoi(optarg); break;
-      case 'p': getpass = 1;             break;
+      case 'p': getpassword = 1;         break;
       case 't': testStr = optarg;        break;
       case 'T': btc->testnet = 1;        break;
       case 'u': updateAndExit = 1;       break;
@@ -1304,7 +1304,7 @@ int main(int argc, char *argv[])
       return 0;
    }
 
-   if (btc->wallet_state == WALLET_ENCRYPTED_LOCKED && getpass) {
+   if (btc->wallet_state == WALLET_ENCRYPTED_LOCKED && getpassword) {
       bool ok;
       bool s;
 

@@ -1,7 +1,12 @@
 
 OS=$(shell uname -s)
+ARCH=$(shell uname -m)
 
+ifeq ($(MACH), armv6l)
+CC = gcc
+else
 CC = clang
+endif
 ASAN = 0
 
 ###
