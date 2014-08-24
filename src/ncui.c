@@ -453,7 +453,7 @@ ncui_get_term_size(int *y, int *x)
 static void
 ncui_signal_cb(int sig)
 {
-   static volatile int insignal;
+   int x, y;
 
    ASSERT(sig == SIGWINCH);
 
@@ -461,27 +461,14 @@ ncui_signal_cb(int sig)
     * Since we call some heavyweight functions from the signal handler, it's
     * possible (and in fact very common) to receive a signal while we're in the
     * middle of processing one.
-    *
-    * In that case, we should just bail out as we risk using an unsynchronized
-    * malloc context. However, just remember that such a thing occurred and
-    * redraw one more time.
     */
-   insignal++;
+   signal(SIGWINCH, SIG_IGN);
 
-   if (insignal > 1) {
-      return;
-   }
+   ncui_get_term_size(&y, &x);
+   resizeterm(y, x);
+   ncui_redraw();
 
-   do {
-      int x, y;
-
-      insignal = 1;
-      ncui_get_term_size(&y, &x);
-      resizeterm(y, x);
-      ncui_redraw();
-   } while (insignal > 1);
-
-   insignal = 0;
+   signal(SIGWINCH, ncui_signal_cb);
 }
 
 
