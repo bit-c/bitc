@@ -66,7 +66,6 @@ endif
 
 VGRND  = valgrind --log-file=/tmp/valgrind.log --leak-check=full --error-exitcode=255
 BLDDIR = bld
-MKBLDDIR = @mkdir -p $(BLDDIR)
 BTC_BIN  = bitc
 ALLTARGETS = bitc
 
