@@ -71,6 +71,7 @@ struct blockstore {
    struct blockset       *blockSet;
    uint256                genesis_hash;
    uint256                best_hash;
+   struct mutex          *lock;
 
    struct blockentry     *best_chain;
    struct blockentry     *genesis;
@@ -96,15 +97,20 @@ blockstore_lookup(const struct blockstore *bs,
    struct blockentry *be;
    bool s;
 
+   be = NULL;
+   mutex_lock(bs->lock);
+
    s = hashtable_lookup(bs->hash_orphans, hash, sizeof *hash, (void *)&be);
    if (s) {
-      return be;
+      goto done;
    }
    s = hashtable_lookup(bs->hash_blk, hash, sizeof *hash, (void *)&be);
    if (s) {
-      return be;
+      goto done;
    }
-   return NULL;
+done:
+   mutex_unlock(bs->lock);
+   return be;
 }
 
 
@@ -195,14 +201,17 @@ blockstore_get_highest(struct blockstore *bs,
 
 int
 blockstore_get_block_height(struct blockstore *bs,
-                            const uint256 *hash)
+                            const uint256     *hash)
 {
    struct blockentry *be;
+   int height;
    bool s;
 
    if (uint256_iszero(hash)) {
       return 0;
    }
+
+   mutex_lock(bs->lock);
 
    s = hashtable_lookup(bs->hash_blk, hash, sizeof *hash, (void*)&be);
    if (s == 0) {
@@ -211,10 +220,16 @@ blockstore_get_block_height(struct blockstore *bs,
       uint256_snprintf_reverse(hashStr, sizeof hashStr, hash);
       Warning(LGPFX" block %s not found.\n", hashStr);
       //ASSERT(0);
-      return 0;
+      height = 0;
+      goto done;
    }
 
-   return be->height;
+   height = be->height;
+
+done:
+   mutex_unlock(bs->lock);
+
+   return height;
 }
 
 
@@ -274,7 +289,10 @@ blockstore_set_chain_links(struct blockstore *bs,
    struct blockentry *prev;
    char hashStr[80];
    uint256 hash;
+   int height;
    bool s;
+
+   mutex_lock(bs->lock);
 
    hash256_calc(&be->header, sizeof be->header, &hash);
    uint256_snprintf_reverse(hashStr, sizeof hashStr, &hash);
@@ -301,7 +319,7 @@ blockstore_set_chain_links(struct blockstore *bs,
          li = li->next;
       }
 
-      return be->height;
+      goto done;
    }
 
    ASSERT(be->height == -1); // orphan
@@ -321,7 +339,11 @@ blockstore_set_chain_links(struct blockstore *bs,
    s = hashtable_insert(bs->hash_blk, &hash, sizeof hash, be);
    ASSERT(s);
 
-   return be->height;
+done:
+   height = be->height;
+   mutex_unlock(bs->lock);
+
+   return height;
 }
 
 
@@ -340,8 +362,12 @@ blockstore_find_alternate_chain_height(struct blockstore *bs,
                                        struct blockentry *be)
 {
    struct blockentry *prev;
+   int height;
+
+   mutex_lock(bs->lock);
 
    if (be->height > 0) {
+      mutex_unlock(bs->lock);
       return be->height;
    }
 
@@ -349,10 +375,15 @@ blockstore_find_alternate_chain_height(struct blockstore *bs,
 
    prev = blockstore_lookup(bs, &be->header.prevBlock);
    if (prev == NULL) {
+      mutex_unlock(bs->lock);
       return 0;
    }
 
-   return 1 + blockstore_find_alternate_chain_height(bs, prev);
+   height = 1 + blockstore_find_alternate_chain_height(bs, prev);
+
+   mutex_unlock(bs->lock);
+
+   return height;
 }
 
 
@@ -371,12 +402,14 @@ blockstore_set_best_chain(struct blockstore *bs,
 {
    int height;
 
+   mutex_lock(bs->lock);
    height = blockstore_find_alternate_chain_height(bs, be);
 
    Log(LGPFX" orphan block: alternate chain height is %d vs current %d\n",
        height, bs->height);
 
    if (height <= bs->height) {
+      mutex_unlock(bs->lock);
       return;
    }
 
@@ -389,6 +422,8 @@ blockstore_set_best_chain(struct blockstore *bs,
    bs->height = height;
 
    memcpy(&bs->best_hash, hash, sizeof *hash);
+
+   mutex_unlock(bs->lock);
 }
 
 
@@ -406,6 +441,8 @@ blockstore_add_entry(struct blockstore *bs,
                      const uint256 *hash)
 {
    bool s;
+
+   mutex_lock(bs->lock);
 
    if (bs->best_chain == NULL) {
 
@@ -451,6 +488,7 @@ blockstore_add_entry(struct blockstore *bs,
 
       blockstore_set_best_chain(bs, be, hash);
    }
+   mutex_unlock(bs->lock);
 }
 
 
@@ -466,7 +504,13 @@ bool
 blockstore_has_header(const struct blockstore *bs,
                       const uint256 *hash)
 {
-   return hashtable_lookup(bs->hash_blk, hash, sizeof *hash, NULL);
+   bool s;
+
+   mutex_lock(bs->lock);
+   s = hashtable_lookup(bs->hash_blk, hash, sizeof *hash, NULL);
+   mutex_unlock(bs->lock);
+
+   return s;
 }
 
 
@@ -482,7 +526,13 @@ bool
 blockstore_is_orphan(const struct blockstore *bs,
                      const uint256 *hash)
 {
-   return hashtable_lookup(bs->hash_orphans, hash, sizeof *hash, NULL);
+   bool s;
+
+   mutex_lock(bs->lock);
+   s = hashtable_lookup(bs->hash_orphans, hash, sizeof *hash, NULL);
+   mutex_unlock(bs->lock);
+
+   return s;
 }
 
 
@@ -892,6 +942,8 @@ blockstore_init(struct config *config,
    }
 
    Log(LGPFX" loaded %d headers.\n", bs->height + 1);
+
+   bs->lock = mutex_alloc();
    *blockStore = bs;
 
    return 0;
@@ -912,28 +964,29 @@ exit:
  */
 
 void
-blockstore_exit(struct blockstore *blockStore)
+blockstore_exit(struct blockstore *bs)
 {
-   if (blockStore == NULL) {
+   if (bs == NULL) {
       return;
    }
 
-   blockstore_write_headers(blockStore);
+   blockstore_write_headers(bs);
 
-   if (blockStore->height > 0) {
-      Log(LGPFX" closing blockstore w/ height=%d\n", blockStore->height);
+   if (bs->height > 0) {
+      Log(LGPFX" closing blockstore w/ height=%d\n", bs->height);
    }
 
-   blockset_close(blockStore->blockSet);
+   blockset_close(bs->blockSet);
 
-   hashtable_printstats(blockStore->hash_blk, "blocks");
-   hashtable_clear_with_free(blockStore->hash_blk);
-   hashtable_clear_with_free(blockStore->hash_orphans);
-   hashtable_destroy(blockStore->hash_blk);
-   hashtable_destroy(blockStore->hash_orphans);
+   hashtable_printstats(bs->hash_blk, "blocks");
+   hashtable_clear_with_free(bs->hash_blk);
+   hashtable_clear_with_free(bs->hash_orphans);
+   hashtable_destroy(bs->hash_blk);
+   hashtable_destroy(bs->hash_orphans);
 
-   memset(blockStore, 0, sizeof *blockStore);
-   free(blockStore);
+   mutex_free(bs->lock);
+   memset(bs, 0, sizeof *bs);
+   free(bs);
 }
 
 
@@ -985,12 +1038,17 @@ blockstore_is_next(struct blockstore *bs,
    uint256 hash;
    bool s;
 
+   mutex_lock(bs->lock);
+
    s = hashtable_lookup(bs->hash_blk, prev, sizeof *prev, (void*)&be);
    if (s == 0 || be->next == NULL) {
+      mutex_unlock(bs->lock);
       return 0;
    }
 
    hash256_calc(&be->next->header, sizeof be->next->header, &hash);
+   mutex_unlock(bs->lock);
+
    return uint256_issame(&hash, next);
 }
 
@@ -1018,6 +1076,8 @@ blockstore_get_next_hashes(struct blockstore *bs,
    i = 0;
    table = NULL;
 
+   mutex_lock(bs->lock);
+
    s = hashtable_lookup(bs->hash_blk, start, sizeof *start, (void*)&be);
    if (s == 0 || be->next == NULL) {
       goto exit;
@@ -1036,6 +1096,7 @@ blockstore_get_next_hashes(struct blockstore *bs,
 exit:
    *n = i;
    *hash = table;
+   mutex_unlock(bs->lock);
 }
 
 
@@ -1051,11 +1112,13 @@ void
 blockstore_get_best_hash(const struct blockstore *bs,
                          uint256 *hash)
 {
+   mutex_lock(bs->lock);
    if (bs->best_chain == NULL) {
       memset(hash, 0, sizeof *hash);
    } else {
       memcpy(hash, &bs->best_hash, sizeof *hash);
    }
+   mutex_unlock(bs->lock);
 }
 
 
@@ -1080,6 +1143,8 @@ blockstore_get_locator_hashes(const struct blockstore *bs,
    *hash = NULL;
    *num = 0;
 
+   mutex_lock(bs->lock);
+
    be = bs->best_chain;
    while (be) {
       int i;
@@ -1099,6 +1164,8 @@ blockstore_get_locator_hashes(const struct blockstore *bs,
       *hash = safe_malloc(n * sizeof(uint256));
       memcpy(*hash, h, n * sizeof(uint256));
    }
+
+   mutex_unlock(bs->lock);
 }
 
 
@@ -1131,9 +1198,12 @@ blockstore_get_block_timestamp(const struct blockstore *bs,
                                const uint256 *hash)
 {
    struct blockentry *be;
+   time_t ts = 0;
+
+   mutex_lock(bs->lock);
 
    if (uint256_iszero(hash)) {
-      return 0;
+      goto done;
    }
 
    be = blockstore_lookup(bs, hash);
@@ -1143,8 +1213,13 @@ blockstore_get_block_timestamp(const struct blockstore *bs,
       uint256_snprintf_reverse(hashStr, sizeof hashStr, hash);
       Warning(LGPFX" block %s not found.\n", hashStr);
       ASSERT(0);
-      return 0;
+      goto done;
    }
 
-   return be->header.timestamp;
+   ts = be->header.timestamp;
+
+done:
+   mutex_unlock(bs->lock);
+
+   return ts;
 }

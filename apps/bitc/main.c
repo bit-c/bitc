@@ -486,12 +486,16 @@ bitc_check_create_file(const char *filename,
 char *
 bitc_get_directory(void)
 {
-   char *home;
    char *res;
+#ifdef TARGET_OS_IPHONE
+   res = safe_asprintf("~/Library/Application Support/");
+#else
+   char *home;
 
    home = util_gethomedir();
    res = safe_asprintf("%s/.bitc%s", home, btc->testnet ? "-testnet" : "");
    free(home);
+#endif
 
    return res;
 }
