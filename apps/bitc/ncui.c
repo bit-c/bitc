@@ -160,8 +160,6 @@ struct ncui {
    bool                  curs_on;
    int                   fwin_width;
    int                   fwin_height;
-
-   int                   blockIdx;
 };
 
 
@@ -1740,7 +1738,7 @@ ncui_blocklist_update(void)
 
    ASSERT(mutex_islocked(btcui->lock));
 
-   while (btc->ui->blockIdx != btcui->idx) {
+   while (btcui->blockConsIdx != btcui->blockProdIdx) {
       char hashStr[80];
       uint256 *hash;
       uint32 timestamp;
@@ -1748,11 +1746,11 @@ ncui_blocklist_update(void)
       char *ts;
       bool orphan;
 
-      btc->ui->blockIdx = (btc->ui->blockIdx + 1) % ARRAYSIZE(btcui->blocks);
+      btcui->blockConsIdx = (btcui->blockConsIdx + 1) % ARRAYSIZE(btcui->blocks);
 
-      hash      = &btcui->blocks[btc->ui->blockIdx].hash;
-      height    =  btcui->blocks[btc->ui->blockIdx].height;
-      timestamp =  btcui->blocks[btc->ui->blockIdx].timestamp;
+      hash      = &btcui->blocks[btcui->blockConsIdx].hash;
+      height    =  btcui->blocks[btcui->blockConsIdx].height;
+      timestamp =  btcui->blocks[btcui->blockConsIdx].timestamp;
 
       uint256_snprintf_reverse(hashStr, sizeof hashStr, hash);
       ts = print_time_local_short(timestamp);
@@ -2117,7 +2115,7 @@ ncui_dashboard_latest_blocks(WINDOW *win,
       return y;
    }
 
-   idx = btcui->idx;
+   idx = btcui->blockProdIdx;
 
    for (j = 0; j < 12; j++) {
       uint256 *hash    = &btcui->blocks[idx].hash;
@@ -2395,13 +2393,13 @@ ncui_dashboard_header(WINDOW *win,
       char hashStr[80];
 
       uint256_snprintf_reverse(hashStr, sizeof hashStr,
-                               &btcui->blocks[btcui->idx].hash);
+                               &btcui->blocks[btcui->blockProdIdx].hash);
       wattron(win,A_BOLD);
       mvwprintw(win, y, 10, "%s", hashStr);
       wattroff(win,A_BOLD);
    }
    y++;
-   timestamp = btcui->blocks[btcui->idx].timestamp;
+   timestamp = btcui->blocks[btcui->blockProdIdx].timestamp;
    if (timestamp) {
       char str[80];
       char *ts;
@@ -2607,7 +2605,6 @@ ncui_init(void)
    ncui_ncurses_init();
    panic_register_cb(ncui_on_panic_cb, NULL);
    ncui_panel_init();
-   ncui->blockIdx = -1;
 
    bitcui_set_status("ncui ready.");
    ncui_redraw();
