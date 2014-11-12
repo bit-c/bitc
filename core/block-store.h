@@ -35,5 +35,8 @@ void blockstore_get_highest(struct blockstore *bs,
                             uint256 *hash);
 void blockstore_get_locator_hashes(const struct blockstore *bs,
                                    uint256 **hash, int *num);
+bool
+blockstore_get_block_at_height(struct blockstore *bs, int height, uint256 *hash,
+                               btc_block_header *header);
 
 #endif /* __BLOCK_STORE_H__ */

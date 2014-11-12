@@ -234,6 +234,42 @@ done:
 
 
 /*
+ *-------------------------------------------------------------------------
+ *
+ * blockstore_get_block_at_height --
+ *
+ *-------------------------------------------------------------------------
+ */
+
+bool
+blockstore_get_block_at_height(struct blockstore *bs,
+                               int                height,
+                               uint256           *hash,
+                               btc_block_header  *header)
+{
+   struct blockentry *e;
+   bool s = 0;
+
+   mutex_lock(bs->lock);
+
+   ASSERT(height <= bs->height);
+
+   for (e = bs->best_chain; e != bs->genesis; e = e->prev)  {
+      if (e->height == height) {
+         hash256_calc(&e->header, sizeof e->header, hash);
+         *header = e->header;
+         s = 1;
+         break;
+      }
+   }
+
+   mutex_unlock(bs->lock);
+
+   return s;
+}
+
+
+/*
  *------------------------------------------------------------------------
  *
  * blockstore_validate_chkpt --
