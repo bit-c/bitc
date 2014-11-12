@@ -110,7 +110,8 @@ struct btcui {
     * ring of recent blocks.
     */
    int                numBlocks;
-   int                idx;
+   int                blockProdIdx;
+   int                blockConsIdx;
    struct bitcui_block blocks[128];
 
    /*
