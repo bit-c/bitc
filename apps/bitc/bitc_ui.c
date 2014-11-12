@@ -358,17 +358,14 @@ bitcui_notify_cb(void *clientData)
          LOG(1, (LGPFX" handling REQ_TX_UPDATE\n"));
          ncui_tx_update();
          break;
-      case BTCUI_REQ_LOG:
-         {
-            struct bitcui_log_req *req = (struct bitcui_log_req*)msg->data;
-            ncui_log_cb(req->ts, req->str, NULL);
-            free(req->ts);
-            free(req->str);
-         }
-         break;
+      case BTCUI_REQ_LOG: {
+         struct bitcui_log_req *req = (struct bitcui_log_req*)msg->data;
+         ncui_log_cb(req->ts, req->str, NULL);
+         free(req->ts);
+         free(req->str);
+      }  break;
       default:
-         Warning(LGPFX" unhandled btcui msg %d\n", msg->type);
-         ASSERT(0);
+         Panic(LGPFX" unhandled btcui msg %d\n", msg->type);
          break;
       }
 
