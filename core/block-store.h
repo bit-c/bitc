@@ -24,7 +24,7 @@ bool blockstore_is_orphan(const struct blockstore *bs, const uint256 *hash);
 bool blockstore_is_block_known(const struct blockstore *bs, const uint256 *hash);
 int  blockstore_get_height(const struct blockstore *bs);
 int  blockstore_get_block_height(struct blockstore *bs, const uint256 *hash);
-void blockstore_get_hash_from_birth(const struct blockstore *bs, time_t b, uint256 *h);
+void blockstore_get_hash_from_birth(const struct blockstore *bs, uint64 b, uint256 *h);
 bool blockstore_is_next(struct blockstore *bs, const uint256 *p, const uint256 *n);
 time_t blockstore_get_timestamp(const struct blockstore *bs);
 time_t blockstore_get_block_timestamp(const struct blockstore *bs,
