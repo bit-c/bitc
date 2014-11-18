@@ -32,7 +32,7 @@ ifeq ($(OS), OpenBSD)
 CFLAGS += -I/usr/local/include
 endif
 
-CFLAGS += -Ipublic -Ilib/public -Icore/ -Iapps/bitc/ -Iext/public
+CFLAGS += -Ipublic -Ilib/public -Icore/ -Iapps/bitc/ -Iext/src/public
 
 ###
 ### LDOPTS
@@ -101,8 +101,8 @@ BTC_FILES += lib/poll/poll.c
 BTC_FILES += lib/netasync/netasync.c
 BTC_FILES += lib/ip_info/ip_info.c
 
-BTC_FILES += ext/cJSON/cJSON.c
-BTC_FILES += ext/MurmurHash3/MurmurHash3.c
+BTC_FILES += ext/src/cJSON/cJSON.c
+BTC_FILES += ext/src/MurmurHash3/MurmurHash3.c
 
 BTC_FILES += apps/bitc/main.c
 BTC_FILES += apps/bitc/ncui.c
