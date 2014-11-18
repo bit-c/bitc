@@ -279,6 +279,7 @@ wallet_alloc_key(struct wallet *wallet,
 
    key = NULL;
    buf = NULL;
+   len = 0;
    memset(&pub_key, 0, sizeof pub_key);
 
    if (btc->wallet_state == WALLET_ENCRYPTED_LOCKED) {

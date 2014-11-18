@@ -1,0 +1,651 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9C2739BF1A0EC20000ACAB53 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C2739BE1A0EC20000ACAB53 /* libc++.dylib */; };
+		9C9961FB1A1B38A3003DF4CB /* libcrypto_iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C9961F81A1B38A3003DF4CB /* libcrypto_iOS.a */; };
+		9C9961FC1A1B38A3003DF4CB /* libleveldb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C9961F91A1B38A3003DF4CB /* libleveldb.a */; };
+		9C9961FD1A1B38A3003DF4CB /* libssl_iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C9961FA1A1B38A3003DF4CB /* libssl_iOS.a */; };
+		9C9962111A1B38C9003DF4CB /* app.c in Sources */ = {isa = PBXBuildFile; fileRef = 9C9961FE1A1B38C9003DF4CB /* app.c */; };
+		9C9962121A1B38C9003DF4CB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C9962001A1B38C9003DF4CB /* AppDelegate.m */; };
+		9C9962131A1B38C9003DF4CB /* bitc_ios.c in Sources */ = {isa = PBXBuildFile; fileRef = 9C9962011A1B38C9003DF4CB /* bitc_ios.c */; };
+		9C9962141A1B38C9003DF4CB /* bitc_ui.c in Sources */ = {isa = PBXBuildFile; fileRef = 9C9962031A1B38C9003DF4CB /* bitc_ui.c */; };
+		9C9962151A1B38C9003DF4CB /* BlockDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C9962061A1B38C9003DF4CB /* BlockDetailViewController.m */; };
+		9C9962161A1B38C9003DF4CB /* BlockListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C9962081A1B38C9003DF4CB /* BlockListController.m */; };
+		9C9962171A1B38C9003DF4CB /* DashboardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C99620A1A1B38C9003DF4CB /* DashboardController.m */; };
+		9C9962181A1B38C9003DF4CB /* LogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C99620C1A1B38C9003DF4CB /* LogViewController.m */; };
+		9C9962191A1B38C9003DF4CB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C99620D1A1B38C9003DF4CB /* main.m */; };
+		9C99621A1A1B38C9003DF4CB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C99620E1A1B38C9003DF4CB /* Main.storyboard */; };
+		9C99621B1A1B38C9003DF4CB /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C9962101A1B38C9003DF4CB /* WebViewController.m */; };
+		9C9962241A1B3AA7003DF4CB /* cJSON.c in Sources */ = {isa = PBXBuildFile; fileRef = 9C99621E1A1B3AA7003DF4CB /* cJSON.c */; };
+		9C9962251A1B3AA7003DF4CB /* MurmurHash3.c in Sources */ = {isa = PBXBuildFile; fileRef = 9C9962201A1B3AA7003DF4CB /* MurmurHash3.c */; };
+		9CE01C631A0D399700FD5A13 /* config.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C491A0D399700FD5A13 /* config.c */; };
+		9CE01C641A0D399700FD5A13 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C4B1A0D399700FD5A13 /* file.c */; };
+		9CE01C661A0D399700FD5A13 /* hashtable.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C4F1A0D399700FD5A13 /* hashtable.c */; };
+		9CE01C681A0D399700FD5A13 /* netasync.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C531A0D399700FD5A13 /* netasync.c */; };
+		9CE01C691A0D399700FD5A13 /* poll.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C551A0D399700FD5A13 /* poll.c */; };
+		9CE01C6A1A0D399700FD5A13 /* poolworker.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C571A0D399700FD5A13 /* poolworker.c */; };
+		9CE01C6B1A0D399700FD5A13 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C621A0D399700FD5A13 /* util.c */; };
+		9CE01C931A0D3E1500FD5A13 /* addrbook.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C741A0D3E1500FD5A13 /* addrbook.c */; };
+		9CE01C941A0D3E1500FD5A13 /* base58.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C761A0D3E1500FD5A13 /* base58.c */; };
+		9CE01C951A0D3E1500FD5A13 /* block-store.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C781A0D3E1500FD5A13 /* block-store.c */; };
+		9CE01C961A0D3E1500FD5A13 /* bloom.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C7A1A0D3E1500FD5A13 /* bloom.c */; };
+		9CE01C971A0D3E1500FD5A13 /* btc-message.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C7C1A0D3E1500FD5A13 /* btc-message.c */; };
+		9CE01C981A0D3E1500FD5A13 /* crypt.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C7F1A0D3E1500FD5A13 /* crypt.c */; };
+		9CE01C991A0D3E1500FD5A13 /* hash.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C811A0D3E1500FD5A13 /* hash.c */; };
+		9CE01C9A1A0D3E1500FD5A13 /* key.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C831A0D3E1500FD5A13 /* key.c */; };
+		9CE01C9B1A0D3E1500FD5A13 /* peer.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C851A0D3E1500FD5A13 /* peer.c */; };
+		9CE01C9C1A0D3E1500FD5A13 /* peergroup.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C871A0D3E1500FD5A13 /* peergroup.c */; };
+		9CE01C9D1A0D3E1500FD5A13 /* rpc.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C891A0D3E1500FD5A13 /* rpc.c */; };
+		9CE01C9E1A0D3E1500FD5A13 /* script.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C8B1A0D3E1500FD5A13 /* script.c */; };
+		9CE01C9F1A0D3E1500FD5A13 /* serialize.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C8D1A0D3E1500FD5A13 /* serialize.c */; };
+		9CE01CA01A0D3E1500FD5A13 /* txdb.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C8F1A0D3E1500FD5A13 /* txdb.c */; };
+		9CE01CA11A0D3E1500FD5A13 /* wallet.c in Sources */ = {isa = PBXBuildFile; fileRef = 9CE01C911A0D3E1500FD5A13 /* wallet.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		9C2739BE1A0EC20000ACAB53 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		9C53A50D1A0A0BAD000A4511 /* bitc-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "bitc-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C9961F81A1B38A3003DF4CB /* libcrypto_iOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto_iOS.a; path = ext/lib/libcrypto_iOS.a; sourceTree = "<group>"; };
+		9C9961F91A1B38A3003DF4CB /* libleveldb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libleveldb.a; path = ext/lib/libleveldb.a; sourceTree = "<group>"; };
+		9C9961FA1A1B38A3003DF4CB /* libssl_iOS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl_iOS.a; path = ext/lib/libssl_iOS.a; sourceTree = "<group>"; };
+		9C9961FE1A1B38C9003DF4CB /* app.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = app.c; path = "apps/bitc-ios/app.c"; sourceTree = "<group>"; };
+		9C9961FF1A1B38C9003DF4CB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = "apps/bitc-ios/AppDelegate.h"; sourceTree = "<group>"; };
+		9C9962001A1B38C9003DF4CB /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = "apps/bitc-ios/AppDelegate.m"; sourceTree = "<group>"; };
+		9C9962011A1B38C9003DF4CB /* bitc_ios.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bitc_ios.c; path = "apps/bitc-ios/bitc_ios.c"; sourceTree = "<group>"; };
+		9C9962021A1B38C9003DF4CB /* bitc_ios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bitc_ios.h; path = "apps/bitc-ios/bitc_ios.h"; sourceTree = "<group>"; };
+		9C9962031A1B38C9003DF4CB /* bitc_ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bitc_ui.c; path = "apps/bitc-ios/bitc_ui.c"; sourceTree = "<group>"; };
+		9C9962041A1B38C9003DF4CB /* bitc_ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bitc_ui.h; path = "apps/bitc-ios/bitc_ui.h"; sourceTree = "<group>"; };
+		9C9962051A1B38C9003DF4CB /* BlockDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlockDetailViewController.h; path = "apps/bitc-ios/BlockDetailViewController.h"; sourceTree = "<group>"; };
+		9C9962061A1B38C9003DF4CB /* BlockDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BlockDetailViewController.m; path = "apps/bitc-ios/BlockDetailViewController.m"; sourceTree = "<group>"; };
+		9C9962071A1B38C9003DF4CB /* BlockListController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BlockListController.h; path = "apps/bitc-ios/BlockListController.h"; sourceTree = "<group>"; };
+		9C9962081A1B38C9003DF4CB /* BlockListController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BlockListController.m; path = "apps/bitc-ios/BlockListController.m"; sourceTree = "<group>"; };
+		9C9962091A1B38C9003DF4CB /* DashboardController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DashboardController.h; path = "apps/bitc-ios/DashboardController.h"; sourceTree = "<group>"; };
+		9C99620A1A1B38C9003DF4CB /* DashboardController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DashboardController.m; path = "apps/bitc-ios/DashboardController.m"; sourceTree = "<group>"; };
+		9C99620B1A1B38C9003DF4CB /* LogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LogViewController.h; path = "apps/bitc-ios/LogViewController.h"; sourceTree = "<group>"; };
+		9C99620C1A1B38C9003DF4CB /* LogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LogViewController.m; path = "apps/bitc-ios/LogViewController.m"; sourceTree = "<group>"; };
+		9C99620D1A1B38C9003DF4CB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "apps/bitc-ios/main.m"; sourceTree = "<group>"; };
+		9C99620E1A1B38C9003DF4CB /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = "apps/bitc-ios/Main.storyboard"; sourceTree = "<group>"; };
+		9C99620F1A1B38C9003DF4CB /* WebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebViewController.h; path = "apps/bitc-ios/WebViewController.h"; sourceTree = "<group>"; };
+		9C9962101A1B38C9003DF4CB /* WebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebViewController.m; path = "apps/bitc-ios/WebViewController.m"; sourceTree = "<group>"; };
+		9C99621E1A1B3AA7003DF4CB /* cJSON.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cJSON.c; sourceTree = "<group>"; };
+		9C9962201A1B3AA7003DF4CB /* MurmurHash3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MurmurHash3.c; sourceTree = "<group>"; };
+		9C9962221A1B3AA7003DF4CB /* cJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cJSON.h; sourceTree = "<group>"; };
+		9C9962231A1B3AA7003DF4CB /* MurmurHash3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MurmurHash3.h; sourceTree = "<group>"; };
+		9CDCFBCC1A0EE347002E2810 /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = app.h; sourceTree = "<group>"; };
+		9CE01C491A0D399700FD5A13 /* config.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = config.c; sourceTree = "<group>"; };
+		9CE01C4B1A0D399700FD5A13 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = file.c; sourceTree = "<group>"; };
+		9CE01C4F1A0D399700FD5A13 /* hashtable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hashtable.c; sourceTree = "<group>"; };
+		9CE01C531A0D399700FD5A13 /* netasync.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = netasync.c; sourceTree = "<group>"; };
+		9CE01C551A0D399700FD5A13 /* poll.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = poll.c; sourceTree = "<group>"; };
+		9CE01C571A0D399700FD5A13 /* poolworker.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = poolworker.c; sourceTree = "<group>"; };
+		9CE01C591A0D399700FD5A13 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		9CE01C5A1A0D399700FD5A13 /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
+		9CE01C5B1A0D399700FD5A13 /* hashtable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hashtable.h; sourceTree = "<group>"; };
+		9CE01C5C1A0D399700FD5A13 /* ip_info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ip_info.h; sourceTree = "<group>"; };
+		9CE01C5D1A0D399700FD5A13 /* netasync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = netasync.h; sourceTree = "<group>"; };
+		9CE01C5E1A0D399700FD5A13 /* poll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = poll.h; sourceTree = "<group>"; };
+		9CE01C5F1A0D399700FD5A13 /* poolworker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = poolworker.h; sourceTree = "<group>"; };
+		9CE01C601A0D399700FD5A13 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		9CE01C621A0D399700FD5A13 /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = util.c; sourceTree = "<group>"; };
+		9CE01C6D1A0D39AB00FD5A13 /* atomic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = atomic.h; sourceTree = "<group>"; };
+		9CE01C6E1A0D39AB00FD5A13 /* basic_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = basic_defs.h; sourceTree = "<group>"; };
+		9CE01C6F1A0D39AB00FD5A13 /* bitc-defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "bitc-defs.h"; sourceTree = "<group>"; };
+		9CE01C701A0D39AB00FD5A13 /* bitc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitc.h; sourceTree = "<group>"; };
+		9CE01C711A0D39AB00FD5A13 /* circlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = circlist.h; sourceTree = "<group>"; };
+		9CE01C721A0D39AB00FD5A13 /* fx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fx.h; sourceTree = "<group>"; };
+		9CE01C741A0D3E1500FD5A13 /* addrbook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = addrbook.c; sourceTree = "<group>"; };
+		9CE01C751A0D3E1500FD5A13 /* addrbook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = addrbook.h; sourceTree = "<group>"; };
+		9CE01C761A0D3E1500FD5A13 /* base58.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = base58.c; sourceTree = "<group>"; };
+		9CE01C771A0D3E1500FD5A13 /* base58.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = base58.h; sourceTree = "<group>"; };
+		9CE01C781A0D3E1500FD5A13 /* block-store.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "block-store.c"; sourceTree = "<group>"; };
+		9CE01C791A0D3E1500FD5A13 /* block-store.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "block-store.h"; sourceTree = "<group>"; };
+		9CE01C7A1A0D3E1500FD5A13 /* bloom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bloom.c; sourceTree = "<group>"; };
+		9CE01C7B1A0D3E1500FD5A13 /* bloom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bloom.h; sourceTree = "<group>"; };
+		9CE01C7C1A0D3E1500FD5A13 /* btc-message.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "btc-message.c"; sourceTree = "<group>"; };
+		9CE01C7D1A0D3E1500FD5A13 /* btc-message.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "btc-message.h"; sourceTree = "<group>"; };
+		9CE01C7E1A0D3E1500FD5A13 /* buff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buff.h; sourceTree = "<group>"; };
+		9CE01C7F1A0D3E1500FD5A13 /* crypt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crypt.c; sourceTree = "<group>"; };
+		9CE01C801A0D3E1500FD5A13 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
+		9CE01C811A0D3E1500FD5A13 /* hash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hash.c; sourceTree = "<group>"; };
+		9CE01C821A0D3E1500FD5A13 /* hash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hash.h; sourceTree = "<group>"; };
+		9CE01C831A0D3E1500FD5A13 /* key.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = key.c; sourceTree = "<group>"; };
+		9CE01C841A0D3E1500FD5A13 /* key.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = key.h; sourceTree = "<group>"; };
+		9CE01C851A0D3E1500FD5A13 /* peer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = peer.c; sourceTree = "<group>"; };
+		9CE01C861A0D3E1500FD5A13 /* peer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = peer.h; sourceTree = "<group>"; };
+		9CE01C871A0D3E1500FD5A13 /* peergroup.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = peergroup.c; sourceTree = "<group>"; };
+		9CE01C881A0D3E1500FD5A13 /* peergroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = peergroup.h; sourceTree = "<group>"; };
+		9CE01C891A0D3E1500FD5A13 /* rpc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rpc.c; sourceTree = "<group>"; };
+		9CE01C8A1A0D3E1500FD5A13 /* rpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rpc.h; sourceTree = "<group>"; };
+		9CE01C8B1A0D3E1500FD5A13 /* script.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = script.c; sourceTree = "<group>"; };
+		9CE01C8C1A0D3E1500FD5A13 /* script.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = script.h; sourceTree = "<group>"; };
+		9CE01C8D1A0D3E1500FD5A13 /* serialize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = serialize.c; sourceTree = "<group>"; };
+		9CE01C8E1A0D3E1500FD5A13 /* serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = serialize.h; sourceTree = "<group>"; };
+		9CE01C8F1A0D3E1500FD5A13 /* txdb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = txdb.c; sourceTree = "<group>"; };
+		9CE01C901A0D3E1500FD5A13 /* txdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = txdb.h; sourceTree = "<group>"; };
+		9CE01C911A0D3E1500FD5A13 /* wallet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = wallet.c; sourceTree = "<group>"; };
+		9CE01C921A0D3E1500FD5A13 /* wallet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wallet.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9C53A50A1A0A0BAD000A4511 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C9961FB1A1B38A3003DF4CB /* libcrypto_iOS.a in Frameworks */,
+				9C9961FC1A1B38A3003DF4CB /* libleveldb.a in Frameworks */,
+				9C9961FD1A1B38A3003DF4CB /* libssl_iOS.a in Frameworks */,
+				9C2739BF1A0EC20000ACAB53 /* libc++.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9C2739C51A0EDCD000ACAB53 /* app */ = {
+			isa = PBXGroup;
+			children = (
+				9C9961FE1A1B38C9003DF4CB /* app.c */,
+				9C9961FF1A1B38C9003DF4CB /* AppDelegate.h */,
+				9C9962001A1B38C9003DF4CB /* AppDelegate.m */,
+				9C9962011A1B38C9003DF4CB /* bitc_ios.c */,
+				9C9962021A1B38C9003DF4CB /* bitc_ios.h */,
+				9C9962031A1B38C9003DF4CB /* bitc_ui.c */,
+				9C9962041A1B38C9003DF4CB /* bitc_ui.h */,
+				9C9962051A1B38C9003DF4CB /* BlockDetailViewController.h */,
+				9C9962061A1B38C9003DF4CB /* BlockDetailViewController.m */,
+				9C9962071A1B38C9003DF4CB /* BlockListController.h */,
+				9C9962081A1B38C9003DF4CB /* BlockListController.m */,
+				9C9962091A1B38C9003DF4CB /* DashboardController.h */,
+				9C99620A1A1B38C9003DF4CB /* DashboardController.m */,
+				9C99620B1A1B38C9003DF4CB /* LogViewController.h */,
+				9C99620C1A1B38C9003DF4CB /* LogViewController.m */,
+				9C99620D1A1B38C9003DF4CB /* main.m */,
+				9C99620E1A1B38C9003DF4CB /* Main.storyboard */,
+				9C99620F1A1B38C9003DF4CB /* WebViewController.h */,
+				9C9962101A1B38C9003DF4CB /* WebViewController.m */,
+			);
+			name = app;
+			sourceTree = "<group>";
+		};
+		9C53A5041A0A0BAD000A4511 = {
+			isa = PBXGroup;
+			children = (
+				9C9961F81A1B38A3003DF4CB /* libcrypto_iOS.a */,
+				9C9961F91A1B38A3003DF4CB /* libleveldb.a */,
+				9C9961FA1A1B38A3003DF4CB /* libssl_iOS.a */,
+				9C2739BE1A0EC20000ACAB53 /* libc++.dylib */,
+				9C2739C51A0EDCD000ACAB53 /* app */,
+				9CE01C731A0D3E1500FD5A13 /* core */,
+				9CE01C6C1A0D39AB00FD5A13 /* public */,
+				9CE01C471A0D399700FD5A13 /* lib */,
+				9CE01C3D1A0D398900FD5A13 /* ext */,
+				9C53A50E1A0A0BAD000A4511 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9C53A50E1A0A0BAD000A4511 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9C53A50D1A0A0BAD000A4511 /* bitc-ios.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9C99621C1A1B3AA7003DF4CB /* src */ = {
+			isa = PBXGroup;
+			children = (
+				9C99621D1A1B3AA7003DF4CB /* cJSON */,
+				9C99621F1A1B3AA7003DF4CB /* MurmurHash3 */,
+				9C9962211A1B3AA7003DF4CB /* public */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		9C99621D1A1B3AA7003DF4CB /* cJSON */ = {
+			isa = PBXGroup;
+			children = (
+				9C99621E1A1B3AA7003DF4CB /* cJSON.c */,
+			);
+			path = cJSON;
+			sourceTree = "<group>";
+		};
+		9C99621F1A1B3AA7003DF4CB /* MurmurHash3 */ = {
+			isa = PBXGroup;
+			children = (
+				9C9962201A1B3AA7003DF4CB /* MurmurHash3.c */,
+			);
+			path = MurmurHash3;
+			sourceTree = "<group>";
+		};
+		9C9962211A1B3AA7003DF4CB /* public */ = {
+			isa = PBXGroup;
+			children = (
+				9C9962221A1B3AA7003DF4CB /* cJSON.h */,
+				9C9962231A1B3AA7003DF4CB /* MurmurHash3.h */,
+			);
+			path = public;
+			sourceTree = "<group>";
+		};
+		9CE01C3D1A0D398900FD5A13 /* ext */ = {
+			isa = PBXGroup;
+			children = (
+				9C99621C1A1B3AA7003DF4CB /* src */,
+			);
+			path = ext;
+			sourceTree = "<group>";
+		};
+		9CE01C471A0D399700FD5A13 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				9CE01C481A0D399700FD5A13 /* config */,
+				9CE01C4A1A0D399700FD5A13 /* file */,
+				9CE01C4E1A0D399700FD5A13 /* hashtable */,
+				9CE01C521A0D399700FD5A13 /* netasync */,
+				9CE01C541A0D399700FD5A13 /* poll */,
+				9CE01C561A0D399700FD5A13 /* poolworker */,
+				9CE01C581A0D399700FD5A13 /* public */,
+				9CE01C611A0D399700FD5A13 /* util */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		9CE01C481A0D399700FD5A13 /* config */ = {
+			isa = PBXGroup;
+			children = (
+				9CE01C491A0D399700FD5A13 /* config.c */,
+			);
+			path = config;
+			sourceTree = "<group>";
+		};
+		9CE01C4A1A0D399700FD5A13 /* file */ = {
+			isa = PBXGroup;
+			children = (
+				9CE01C4B1A0D399700FD5A13 /* file.c */,
+			);
+			path = file;
+			sourceTree = "<group>";
+		};
+		9CE01C4E1A0D399700FD5A13 /* hashtable */ = {
+			isa = PBXGroup;
+			children = (
+				9CE01C4F1A0D399700FD5A13 /* hashtable.c */,
+			);
+			path = hashtable;
+			sourceTree = "<group>";
+		};
+		9CE01C521A0D399700FD5A13 /* netasync */ = {
+			isa = PBXGroup;
+			children = (
+				9CE01C531A0D399700FD5A13 /* netasync.c */,
+			);
+			path = netasync;
+			sourceTree = "<group>";
+		};
+		9CE01C541A0D399700FD5A13 /* poll */ = {
+			isa = PBXGroup;
+			children = (
+				9CE01C551A0D399700FD5A13 /* poll.c */,
+			);
+			path = poll;
+			sourceTree = "<group>";
+		};
+		9CE01C561A0D399700FD5A13 /* poolworker */ = {
+			isa = PBXGroup;
+			children = (
+				9CE01C571A0D399700FD5A13 /* poolworker.c */,
+			);
+			path = poolworker;
+			sourceTree = "<group>";
+		};
+		9CE01C581A0D399700FD5A13 /* public */ = {
+			isa = PBXGroup;
+			children = (
+				9CE01C591A0D399700FD5A13 /* config.h */,
+				9CE01C5A1A0D399700FD5A13 /* file.h */,
+				9CE01C5B1A0D399700FD5A13 /* hashtable.h */,
+				9CE01C5C1A0D399700FD5A13 /* ip_info.h */,
+				9CE01C5D1A0D399700FD5A13 /* netasync.h */,
+				9CE01C5E1A0D399700FD5A13 /* poll.h */,
+				9CE01C5F1A0D399700FD5A13 /* poolworker.h */,
+				9CE01C601A0D399700FD5A13 /* util.h */,
+			);
+			path = public;
+			sourceTree = "<group>";
+		};
+		9CE01C611A0D399700FD5A13 /* util */ = {
+			isa = PBXGroup;
+			children = (
+				9CE01C621A0D399700FD5A13 /* util.c */,
+			);
+			path = util;
+			sourceTree = "<group>";
+		};
+		9CE01C6C1A0D39AB00FD5A13 /* public */ = {
+			isa = PBXGroup;
+			children = (
+				9CDCFBCC1A0EE347002E2810 /* app.h */,
+				9CE01C6D1A0D39AB00FD5A13 /* atomic.h */,
+				9CE01C6E1A0D39AB00FD5A13 /* basic_defs.h */,
+				9CE01C6F1A0D39AB00FD5A13 /* bitc-defs.h */,
+				9CE01C701A0D39AB00FD5A13 /* bitc.h */,
+				9CE01C711A0D39AB00FD5A13 /* circlist.h */,
+				9CE01C721A0D39AB00FD5A13 /* fx.h */,
+			);
+			path = public;
+			sourceTree = "<group>";
+		};
+		9CE01C731A0D3E1500FD5A13 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				9CE01C741A0D3E1500FD5A13 /* addrbook.c */,
+				9CE01C751A0D3E1500FD5A13 /* addrbook.h */,
+				9CE01C761A0D3E1500FD5A13 /* base58.c */,
+				9CE01C771A0D3E1500FD5A13 /* base58.h */,
+				9CE01C781A0D3E1500FD5A13 /* block-store.c */,
+				9CE01C791A0D3E1500FD5A13 /* block-store.h */,
+				9CE01C7A1A0D3E1500FD5A13 /* bloom.c */,
+				9CE01C7B1A0D3E1500FD5A13 /* bloom.h */,
+				9CE01C7C1A0D3E1500FD5A13 /* btc-message.c */,
+				9CE01C7D1A0D3E1500FD5A13 /* btc-message.h */,
+				9CE01C7E1A0D3E1500FD5A13 /* buff.h */,
+				9CE01C7F1A0D3E1500FD5A13 /* crypt.c */,
+				9CE01C801A0D3E1500FD5A13 /* crypt.h */,
+				9CE01C811A0D3E1500FD5A13 /* hash.c */,
+				9CE01C821A0D3E1500FD5A13 /* hash.h */,
+				9CE01C831A0D3E1500FD5A13 /* key.c */,
+				9CE01C841A0D3E1500FD5A13 /* key.h */,
+				9CE01C851A0D3E1500FD5A13 /* peer.c */,
+				9CE01C861A0D3E1500FD5A13 /* peer.h */,
+				9CE01C871A0D3E1500FD5A13 /* peergroup.c */,
+				9CE01C881A0D3E1500FD5A13 /* peergroup.h */,
+				9CE01C891A0D3E1500FD5A13 /* rpc.c */,
+				9CE01C8A1A0D3E1500FD5A13 /* rpc.h */,
+				9CE01C8B1A0D3E1500FD5A13 /* script.c */,
+				9CE01C8C1A0D3E1500FD5A13 /* script.h */,
+				9CE01C8D1A0D3E1500FD5A13 /* serialize.c */,
+				9CE01C8E1A0D3E1500FD5A13 /* serialize.h */,
+				9CE01C8F1A0D3E1500FD5A13 /* txdb.c */,
+				9CE01C901A0D3E1500FD5A13 /* txdb.h */,
+				9CE01C911A0D3E1500FD5A13 /* wallet.c */,
+				9CE01C921A0D3E1500FD5A13 /* wallet.h */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9C53A50C1A0A0BAD000A4511 /* bitc-ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9C53A5331A0A0BAE000A4511 /* Build configuration list for PBXNativeTarget "bitc-ios" */;
+			buildPhases = (
+				9C53A5091A0A0BAD000A4511 /* Sources */,
+				9C53A50A1A0A0BAD000A4511 /* Frameworks */,
+				9C53A50B1A0A0BAD000A4511 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "bitc-ios";
+			productName = SimpleTest;
+			productReference = 9C53A50D1A0A0BAD000A4511 /* bitc-ios.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9C53A5051A0A0BAD000A4511 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = "Maxime Austruy";
+				TargetAttributes = {
+					9C53A50C1A0A0BAD000A4511 = {
+						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = 8QD327TWF2;
+					};
+				};
+			};
+			buildConfigurationList = 9C53A5081A0A0BAD000A4511 /* Build configuration list for PBXProject "bitc-ios" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9C53A5041A0A0BAD000A4511;
+			productRefGroup = 9C53A50E1A0A0BAD000A4511 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9C53A50C1A0A0BAD000A4511 /* bitc-ios */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9C53A50B1A0A0BAD000A4511 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C99621A1A1B38C9003DF4CB /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9C53A5091A0A0BAD000A4511 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C9962141A1B38C9003DF4CB /* bitc_ui.c in Sources */,
+				9CE01C6B1A0D399700FD5A13 /* util.c in Sources */,
+				9C9962131A1B38C9003DF4CB /* bitc_ios.c in Sources */,
+				9C9962251A1B3AA7003DF4CB /* MurmurHash3.c in Sources */,
+				9CE01C9A1A0D3E1500FD5A13 /* key.c in Sources */,
+				9CE01C661A0D399700FD5A13 /* hashtable.c in Sources */,
+				9C9962181A1B38C9003DF4CB /* LogViewController.m in Sources */,
+				9C9962151A1B38C9003DF4CB /* BlockDetailViewController.m in Sources */,
+				9CE01C9F1A0D3E1500FD5A13 /* serialize.c in Sources */,
+				9CE01C981A0D3E1500FD5A13 /* crypt.c in Sources */,
+				9C9962121A1B38C9003DF4CB /* AppDelegate.m in Sources */,
+				9CE01C691A0D399700FD5A13 /* poll.c in Sources */,
+				9CE01C631A0D399700FD5A13 /* config.c in Sources */,
+				9CE01C991A0D3E1500FD5A13 /* hash.c in Sources */,
+				9CE01C641A0D399700FD5A13 /* file.c in Sources */,
+				9CE01C681A0D399700FD5A13 /* netasync.c in Sources */,
+				9CE01C971A0D3E1500FD5A13 /* btc-message.c in Sources */,
+				9CE01C961A0D3E1500FD5A13 /* bloom.c in Sources */,
+				9CE01C6A1A0D399700FD5A13 /* poolworker.c in Sources */,
+				9C9962241A1B3AA7003DF4CB /* cJSON.c in Sources */,
+				9CE01C941A0D3E1500FD5A13 /* base58.c in Sources */,
+				9C9962111A1B38C9003DF4CB /* app.c in Sources */,
+				9C9962161A1B38C9003DF4CB /* BlockListController.m in Sources */,
+				9C9962191A1B38C9003DF4CB /* main.m in Sources */,
+				9CE01C9E1A0D3E1500FD5A13 /* script.c in Sources */,
+				9C9962171A1B38C9003DF4CB /* DashboardController.m in Sources */,
+				9CE01C9D1A0D3E1500FD5A13 /* rpc.c in Sources */,
+				9CE01C931A0D3E1500FD5A13 /* addrbook.c in Sources */,
+				9CE01C951A0D3E1500FD5A13 /* block-store.c in Sources */,
+				9CE01CA11A0D3E1500FD5A13 /* wallet.c in Sources */,
+				9CE01C9C1A0D3E1500FD5A13 /* peergroup.c in Sources */,
+				9C99621B1A1B38C9003DF4CB /* WebViewController.m in Sources */,
+				9CE01CA01A0D3E1500FD5A13 /* txdb.c in Sources */,
+				9CE01C9B1A0D3E1500FD5A13 /* peer.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9C53A5311A0A0BAE000A4511 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9C53A5321A0A0BAE000A4511 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9C53A5341A0A0BAE000A4511 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"GCC_WARN_64_TO_32_BIT_CONVERSION[arch=*64]" = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(PROJECT_DIR)/ext/include",
+					"$(PROJECT_DIR)/ext/src/include",
+				);
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(PROJECT_DIR)/ext/include",
+					"$(PROJECT_DIR)/ext/src/public",
+				);
+				INFOPLIST_FILE = "$(SRCROOT)/apps/bitc-ios/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ext/lib",
+				);
+				New_Setting = "";
+				PRODUCT_NAME = "bitc-ios";
+				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/public";
+			};
+			name = Debug;
+		};
+		9C53A5351A0A0BAE000A4511 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				"HEADER_SEARCH_PATHS[arch=*]" = /Users/maxime/git/leveldb/include;
+				INFOPLIST_FILE = "$(SRCROOT)/apps/bitc-ios/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ext/lib",
+				);
+				New_Setting = "";
+				PRODUCT_NAME = "bitc-ios";
+				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/public";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9C53A5081A0A0BAD000A4511 /* Build configuration list for PBXProject "bitc-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C53A5311A0A0BAE000A4511 /* Debug */,
+				9C53A5321A0A0BAE000A4511 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9C53A5331A0A0BAE000A4511 /* Build configuration list for PBXNativeTarget "bitc-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C53A5341A0A0BAE000A4511 /* Debug */,
+				9C53A5351A0A0BAE000A4511 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9C53A5051A0A0BAD000A4511 /* Project object */;
+}

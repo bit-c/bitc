@@ -32,7 +32,7 @@ ifeq ($(OS), OpenBSD)
 CFLAGS += -I/usr/local/include
 endif
 
-CFLAGS += -Ipublic -Ilib/public -Icore/ -Iapps/bitc/ -Iext/src/public
+CFLAGS += -Ipublic -Ilib/public -Icore/ -Iapps/bitc-cli/ -Iext/src/public
 
 ###
 ### LDOPTS
@@ -104,10 +104,10 @@ BTC_FILES += lib/ip_info/ip_info.c
 BTC_FILES += ext/src/cJSON/cJSON.c
 BTC_FILES += ext/src/MurmurHash3/MurmurHash3.c
 
-BTC_FILES += apps/bitc/main.c
-BTC_FILES += apps/bitc/ncui.c
-BTC_FILES += apps/bitc/bitc_ui.c
-BTC_FILES += apps/bitc/test.c
+BTC_FILES += apps/bitc-cli/main.c
+BTC_FILES += apps/bitc-cli/ncui.c
+BTC_FILES += apps/bitc-cli/bitc_ui.c
+BTC_FILES += apps/bitc-cli/test.c
 
 BTC_FILES := $(sort $(BTC_FILES))
 BTC_OBJ   := $(patsubst %.c,$(BLDDIR)/%.o,$(BTC_FILES))
