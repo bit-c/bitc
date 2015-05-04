@@ -29,7 +29,7 @@ bitc is a *thin* SPV bitcoin client.
  - libcurl: an http library. It's released under a MIT/X derivate license.  
 	http://curl.haxx.se/libcurl/
  - LevelDB: Google's key value store, released under the BSD 3-Clause License.  
-	https://code.google.com/p/leveldb/
+	https://github.com/google/leveldb
  - OpenSSL: crypto library.  
         https://www.openssl.org/
 
