@@ -5,8 +5,8 @@ ARCH=$(shell uname -m)
 ifeq ($(ARCH), armv6l)
 CC = gcc
 elif ($(ARCH), x86_64)
-CC = gcce
-lse
+CC = gcc
+else
 CC = clang
 endif
 ASAN = 0
