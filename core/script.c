@@ -5,6 +5,7 @@
 #include "buff.h"
 #include "key.h"
 #include "wallet.h"
+#include "base58.h"
 
 #define LGPFX "SCRIPT:"
 
@@ -17,6 +18,9 @@ static const uint8 std_pubkeyhash[] = {
    OP_DUP, OP_HASH160, OP_PUBKEYHASH, OP_EQUALVERIFY, OP_CHECKSIG,
 };
 
+static const uint8 std_scripthash[] = {
+	OP_HASH160, OP_PUSH20, OP_PUBKEYHASH, OP_EQUAL
+};
 
 static const struct {
    enum script_txout_type type;
@@ -25,6 +29,7 @@ static const struct {
 } std_scripts[] = {
    { TX_PUBKEY,     sizeof(std_pubkey),     std_pubkey },
    { TX_PUBKEYHASH, sizeof(std_pubkeyhash), std_pubkeyhash },
+   { TX_SCRIPTHASH, sizeof(std_scripthash), std_scripthash },
 };
 
 
@@ -270,7 +275,9 @@ script_parse_one_op(struct buff *buf,
    }
    inst->opcode = opcode;
 
-   if (opcode < OP_PUSHDATA1) {
+   if (opcode == OP_PUSH20) {
+      len = 20;
+   } else if (opcode < OP_PUSHDATA1) {
       len = opcode;
    } else if (opcode == OP_PUSHDATA1) {
       uint8 len8;
@@ -405,23 +412,32 @@ script_classify(struct script *script)
  */
 
 int
-script_txo_generate(const uint160 *pubkey,
+script_txo_generate(uint8 type,
+                    const uint160 *pubkey,
                     uint8 **script,
                     uint64 *scriptLen)
 {
    struct buff *buf = buff_alloc();
 
-   serialize_uint8(buf, OP_DUP);
-   serialize_uint8(buf, OP_HASH160);
-   script_push_data(buf, pubkey, sizeof *pubkey);
-   serialize_uint8(buf, OP_EQUALVERIFY);
-   serialize_uint8(buf, OP_CHECKSIG);
+   switch (type) {
+      case PUBKEY_ADDRESS:
+         serialize_uint8(buf, OP_DUP);
+         serialize_uint8(buf, OP_HASH160);
+         script_push_data(buf, pubkey, sizeof *pubkey);
+         serialize_uint8(buf, OP_EQUALVERIFY);
+         serialize_uint8(buf, OP_CHECKSIG);
+         break;
+      case SCRIPT_ADDRESS:
+         serialize_uint8(buf, OP_HASH160);
+         serialize_uint8(buf, OP_PUSH20);
+         serialize_bytes(buf, pubkey, sizeof *pubkey);
+         serialize_uint8(buf, OP_EQUAL);
+         break;
+   }
 
    *script    = buff_base(buf);
    *scriptLen = buff_curlen(buf);
-
    free(buf);
-
    return 0;
 }
 
@@ -530,6 +546,7 @@ script_match_type(struct buff            *buf,
       ASSERT(*data_addr);
       break;
    case TX_PUBKEYHASH:
+   case TX_SCRIPTHASH:
       *data_len  = script->inst[2].len;
       *data_addr = safe_malloc(*data_len);
       ASSERT(*data_len == sizeof(uint160));
@@ -692,6 +709,7 @@ script_parse_pubkey_hash(const uint8 *scriptPubKey,
       hash160_calc(data, datalen, pubkey);
       break;
    case TX_PUBKEYHASH:
+   case TX_SCRIPTHASH:
       ASSERT(datalen == sizeof(uint160));
       memcpy(pubkey, data, sizeof(uint160));
       break;
