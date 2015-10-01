@@ -1237,15 +1237,17 @@ txdb_set_txo(btc_msg_tx *tx,
 {
    struct btc_msg_tx_out *txo;
    uint160 pubkey;
+   uint8 type;
 
-   b58_pubkey_to_uint160(btc_addr, &pubkey);
+   type = b58_pubkey_to_uint160(btc_addr, &pubkey);
    Log_Bytes(LGPFX" hash-addr:", &pubkey, sizeof pubkey);
 
    ASSERT(idx < tx->out_count);
    txo = tx->tx_out + idx;
    txo->value = value;
 
-   script_txo_generate(&pubkey, &txo->scriptPubKey, &txo->scriptLength);
+   script_txo_generate(type, &pubkey, &txo->scriptPubKey,
+                       &txo->scriptLength);
 }
 
 

@@ -448,10 +448,13 @@ b58_privkey_to_bytes(const char *addr,
  *
  *      Decodes a bitcoin address and retrieve the encode pubkey hash.
  *
+ * Returns:
+ *      The type of address decoded.
+ *
  *------------------------------------------------------------------------
  */
 
-void
+uint8
 b58_pubkey_to_uint160(const char *addr,
                       uint160 *digest)
 {
@@ -460,10 +463,11 @@ b58_pubkey_to_uint160(const char *addr,
    uint8 type;
 
    base58_decode_check(&type, addr, &buf, &len);
-   ASSERT(type == PUBKEY_ADDRESS);
+   ASSERT(type == PUBKEY_ADDRESS || type == SCRIPT_ADDRESS);
    if (len == sizeof *digest) {
       memcpy(digest, buf, sizeof *digest);
    }
    free(buf);
+   return type;
 }
 

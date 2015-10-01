@@ -28,6 +28,7 @@ enum script_opcode {
    // push value
    OP_0         = 0x00,
    OP_FALSE     = OP_0,
+   OP_PUSH20    = 0x14,
    OP_PUSHDATA1 = 0x4c,
    OP_PUSHDATA2 = 0x4d,
    OP_PUSHDATA4 = 0x4e,
@@ -167,7 +168,8 @@ enum script_opcode {
 };
 
 
-int script_txo_generate(const uint160 *pubkey, uint8 **script, uint64 *len);
+int script_txo_generate(uint8 type, const uint160 *pubkey, uint8 **script,
+                        uint64 *len);
 int script_sign(struct wallet *wallet, const struct btc_msg_tx_out *txo,
                 struct btc_msg_tx *tx, uint32 idx, enum script_hash_type hashType);
 int script_parse_pubkey_hash(const uint8 *scriptPubKey, size_t scriptLength,
