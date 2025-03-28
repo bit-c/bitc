@@ -1702,7 +1702,7 @@ ncui_log_cb(const char *ts,
    scrollok(win, true);
    wscrl(win, -1);
    wattron(win, PAIR_GREEN);
-   mvwprintw(win, 0, 0, ts);
+   mvwprintw(win, 0, 0, "%s", ts);
    wattroff(win, PAIR_GREEN);
    mvwaddch(win,  0, tslen, ACS_VLINE);
    if (found) {
