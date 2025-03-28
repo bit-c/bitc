@@ -67,18 +67,18 @@ base58_decode(const char *str,
 {
    const char *buf;
    BN_CTX *ctx;
-   BIGNUM bn58;
-   BIGNUM bnc;
-   BIGNUM bn;
+   BIGNUM *bn58;
+   BIGNUM *bnc;
+   BIGNUM *bn;
 
    ctx = BN_CTX_new();
 
-   BN_init(&bn58);
-   BN_init(&bnc);
-   BN_init(&bn);
+   bn58 = BN_new();
+   bnc  = BN_new();
+   bn   = BN_new();
 
-   BN_set_word(&bn58, 58);
-   BN_set_word(&bn, 0);
+   BN_set_word(bn58, 58);
+   BN_set_word(bn, 0);
    *dst = NULL;
    *dstLen = 0;
 
@@ -98,12 +98,12 @@ base58_decode(const char *str,
          }
          break;
       }
-      BN_set_word(&bnc, p - base58Chars);
-      if (!BN_mul(&bn, &bn, &bn58, ctx)) {
+      BN_set_word(bnc, p - base58Chars);
+      if (!BN_mul(bn, bn, bn58, ctx)) {
          NOT_TESTED();
          goto err;
       }
-      if (!BN_add(&bn, &bn, &bnc)) {
+      if (!BN_add(bn, bn, bnc)) {
          NOT_TESTED();
          goto err;
       }
@@ -111,7 +111,7 @@ base58_decode(const char *str,
 
    uint8 *tmp;
    size_t len;
-   base58_getvch(&bn, &tmp, &len);
+   base58_getvch(bn, &tmp, &len);
 
    if (len >= 2 && tmp[len - 1] == 0 &&
        ((uint8)tmp[len - 2] >= 0x80)) {
@@ -130,9 +130,9 @@ base58_decode(const char *str,
    free(tmp);
 
 err:
-   BN_clear_free(&bn58);
-   BN_clear_free(&bnc);
-   BN_clear_free(&bn);
+   BN_free(bn58);
+   BN_free(bnc);
+   BN_free(bn);
    BN_CTX_free(ctx);
 }
 
@@ -240,37 +240,37 @@ base58_encode(const void *buf,
    char *s = NULL;
    size_t strLen = 0;
    BN_CTX *ctx;
-   BIGNUM bn58;
-   BIGNUM bn0;
-   BIGNUM bn;
-   BIGNUM div0;
-   BIGNUM rem;
+   BIGNUM *bn58;
+   BIGNUM *bn0;
+   BIGNUM *bn;
+   BIGNUM *div0;
+   BIGNUM *rem;
    int i;
 
    ctx = BN_CTX_new();
 
-   BN_init(&div0);
-   BN_init(&rem);
-   BN_init(&bn58);
-   BN_init(&bn0);
-   BN_init(&bn);
+   div0 = BN_new();
+   rem  = BN_new();
+   bn58 = BN_new();
+   bn0  = BN_new();
+   bn   = BN_new();
 
-   BN_set_word(&bn58, 58);
-   BN_set_word(&bn0, 0);
+   BN_set_word(bn58, 58);
+   BN_set_word(bn0, 0);
 
    str_copyreverse(rev, buf0, len);
    rev[len] = 0;
-   base58_setvch(&bn, rev, sizeof rev);
+   base58_setvch(bn, rev, sizeof rev);
    s = NULL;
-   ASSERT(!BN_is_zero(&bn));
+   ASSERT(!BN_is_zero(bn));
 
-   while (BN_cmp(&bn, &bn0) > 0) {
-      if (!BN_div(&div0, &rem, &bn, &bn58, ctx)) {
+   while (BN_cmp(bn, bn0) > 0) {
+      if (!BN_div(div0, rem, bn, bn58, ctx)) {
          goto err;
       }
-      BN_copy(&bn, &div0);
+      BN_copy(bn, div0);
 
-      str[strLen] = base58Chars[BN_get_word(&rem)];
+      str[strLen] = base58Chars[BN_get_word(rem)];
       strLen++;
    }
    ASSERT(strLen != 0);
@@ -288,11 +288,11 @@ base58_encode(const void *buf,
    str_copyreverse(s, str, strLen);
 
 err:
-   BN_clear_free(&bn58);
-   BN_clear_free(&bn0);
-   BN_clear_free(&bn);
-   BN_clear_free(&div0);
-   BN_clear_free(&rem);
+   BN_free(bn58);
+   BN_free(bn0);
+   BN_free(bn);
+   BN_free(div0);
+   BN_free(rem);
    BN_CTX_free(ctx);
 
    return s;

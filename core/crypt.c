@@ -170,7 +170,7 @@ crypt_encrypt(struct crypt_key         *ckey,
               uint8                   **cipher,
               size_t                   *cipher_len)
 {
-   EVP_CIPHER_CTX ctx;
+   EVP_CIPHER_CTX *ctx;
    int clen;
    int flen;
    uint8 *c;
@@ -186,13 +186,13 @@ crypt_encrypt(struct crypt_key         *ckey,
 
    c = safe_malloc(clen);
 
-   EVP_CIPHER_CTX_init(&ctx);
+   ctx = EVP_CIPHER_CTX_new();
 
-   res = EVP_EncryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL, ckey->key, ckey->iv);
-   res = res && EVP_EncryptUpdate(&ctx, c, &clen, plaintext->buf, plaintext->len);
-   res = res && EVP_EncryptFinal_ex(&ctx, c + clen, &flen);
+   res = EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, ckey->key, ckey->iv);
+   res = res && EVP_EncryptUpdate(ctx, c, &clen, plaintext->buf, plaintext->len);
+   res = res && EVP_EncryptFinal_ex(ctx, c + clen, &flen);
 
-   EVP_CIPHER_CTX_cleanup(&ctx);
+   EVP_CIPHER_CTX_free(ctx);
 
    if (res == 0) {
       Log(LGPFX" %s: failed to encrypt %zu bytes\n",
@@ -224,7 +224,7 @@ crypt_decrypt(struct crypt_key    *ckey,
               struct secure_area **plaintext)
 {
    struct secure_area *sec;
-   EVP_CIPHER_CTX ctx;
+   EVP_CIPHER_CTX *ctx;
    int dlen;
    int flen;
    int res;
@@ -235,13 +235,13 @@ crypt_decrypt(struct crypt_key    *ckey,
 
    sec = secure_alloc(dlen);
 
-   EVP_CIPHER_CTX_init(&ctx);
+   ctx = EVP_CIPHER_CTX_new();
 
-   res = EVP_DecryptInit_ex(&ctx, EVP_aes_256_cbc(), NULL, ckey->key, ckey->iv);
-   res = res && EVP_DecryptUpdate(&ctx, sec->buf, &dlen, cipher, cipher_len);
-   res = res && EVP_DecryptFinal_ex(&ctx, sec->buf + dlen, &flen);
+   res = EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, ckey->key, ckey->iv);
+   res = res && EVP_DecryptUpdate(ctx, sec->buf, &dlen, cipher, cipher_len);
+   res = res && EVP_DecryptFinal_ex(ctx, sec->buf + dlen, &flen);
 
-   EVP_CIPHER_CTX_cleanup(&ctx);
+   EVP_CIPHER_CTX_free(ctx);
 
    if (res == 0) {
       Log(LGPFX" %s: failed to decrypt %zu bytes\n", __FUNCTION__, cipher_len);

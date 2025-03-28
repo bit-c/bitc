@@ -233,7 +233,7 @@ key_set_privkey(struct key *k,
                 size_t len)
 {
    BIGNUM *res;
-   BIGNUM bn;
+   BIGNUM *bn;
    int s;
 
    /*
@@ -246,11 +246,11 @@ key_set_privkey(struct key *k,
     */
    ASSERT(len == 32 || len == 33);
 
-   BN_init(&bn);
-   res = BN_bin2bn(privkey, 32, &bn);
+   bn = BN_new();
+   res = BN_bin2bn(privkey, 32, bn);
    ASSERT(res);
 
-   s = key_regenerate(k, &bn);
+   s = key_regenerate(k, bn);
    ASSERT(s);
    ASSERT(EC_KEY_check_key(k->key));
 
@@ -260,7 +260,7 @@ key_set_privkey(struct key *k,
    ASSERT(k->pub_len == 0);
    key_get_pubkey_int(k, &k->pub_key, &k->pub_len);
 
-   BN_clear_free(&bn);
+   BN_free(bn);
    ASSERT(EC_KEY_check_key(k->key));
 
    return 1;

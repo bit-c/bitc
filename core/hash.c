@@ -149,11 +149,15 @@ sha256_calc(const void *buf,
             uint256    *digest)
 {
    uint32 digestLen = sizeof *digest;
-   EVP_MD_CTX ctx;
+   EVP_MD_CTX *ctx;
 
-   EVP_DigestInit(&ctx, EVP_sha256());
-   EVP_DigestUpdate(&ctx, buf, bufLen);
-   EVP_DigestFinal(&ctx, digest->data, &digestLen);
+   ctx = EVP_MD_CTX_new();
+
+   EVP_DigestInit(ctx, EVP_sha256());
+   EVP_DigestUpdate(ctx, buf, bufLen);
+   EVP_DigestFinal(ctx, digest->data, &digestLen);
+
+   EVP_MD_CTX_free(ctx);
 }
 
 
