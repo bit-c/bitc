@@ -206,7 +206,6 @@ void
 poolworker_destroy(struct poolworker_state *pw)
 {
    int numThreads;
-   uint64 c = 0;
    int i;
 
    numThreads = atomic_read(&pw->numRunning);
@@ -223,7 +222,6 @@ poolworker_destroy(struct poolworker_state *pw)
       n = pw->p[i].jobsDone;
       if (n > 0) {
          Log(LGPFX" n[%u]=%u\n", i, n);
-         c += n;
       }
    }
 
