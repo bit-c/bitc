@@ -1,3 +1,5 @@
+[![CI](https://github.com/mx4/bitc/actions/workflows/ci.yml/badge.svg)](https://github.com/mx4/bitc/actions/workflows/ci.yml)
+
 ### BITC
 
 bitc is a *thin* SPV bitcoin client.
