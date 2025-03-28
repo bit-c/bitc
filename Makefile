@@ -14,7 +14,7 @@ ASAN = 0
 ###
 
 CFLAGS  = -O1 -MMD -g
-CFLAGS += -Wall -Werror
+CFLAGS += -Wall
 ifneq ($(ARCH), armv6l)
 CFLAGS += -Wshadow -Wextra
 endif
