@@ -241,22 +241,13 @@ file_listdirectory(const char *directory,
 
    i = 0;
    while (TRUE) {
-      struct dirent entry;
       struct dirent *ent;
 
-#ifdef __CYGWIN__
-      NOT_TESTED();
+      errno = 0;
       ent = readdir(dir);
-      if (ent == NULL) {
-         res = errno;
-      }
-#else
-      ent = NULL;
-      res = readdir_r(dir, &entry, &ent);
-#endif
-      if (res != 0) {
-         Log(LGPFX" readdir_r failed: %s (%d)\n",
-             strerror(res), res);
+      if (errno != 0) {
+         Log(LGPFX" readdir failed: %s (%d)\n",
+             strerror(errno), errno);
          break;
       }
       if (ent == NULL) {
@@ -273,7 +264,7 @@ file_listdirectory(const char *directory,
          }
          names = ptr;
       }
-      names[i] = strdup(entry.d_name);
+      names[i] = strdup(ent->d_name);
       if (names[i] == NULL) {
          res = ENOMEM;
          break;
